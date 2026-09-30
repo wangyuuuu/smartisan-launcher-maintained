@@ -11217,6 +11217,23 @@
 
     if-eqz p1, :cond_1
 
+    # 【维护版 r26】清零之前，先把这个包的系统通知撤掉。
+    # 未读数的真源是「系统里挂着的通知」：通知监听服务（NotificationBadgeService）
+    # 会按 getActiveNotifications() 全量重算并写回 messagesNumber，所以只清 Launcher
+    # 侧的话，下次同步（打开/返回别的 App 时通知监听重连，或期间任意通知来去）
+    # 角标就会复活。撤掉真源之后，再同步回来就是 0。
+    # 只在 messagesNumber > 0（确实挂过未读角标）时撤，避免误伤没有角标的 App 的常驻通知。
+    iget-object v4, p0, Lcom/smartisanos/launcher/view/Cell;->mItemInfo:Lcom/smartisanos/launcher/data/ItemInfo;
+
+    iget v5, v4, Lcom/smartisanos/launcher/data/ItemInfo;->messagesNumber:I
+
+    if-lez v5, :cond_no_cancel_badge
+
+    iget-object v5, v4, Lcom/smartisanos/launcher/data/ItemInfo;->packageName:Ljava/lang/String;
+
+    invoke-static {v5}, Lcom/smartisanos/launcher/notification/NotificationBadgeService;->cancelForPackage(Ljava/lang/String;)V
+
+    :cond_no_cancel_badge
     .line 3058
     iget-object v4, p0, Lcom/smartisanos/launcher/view/Cell;->mItemInfo:Lcom/smartisanos/launcher/data/ItemInfo;
 

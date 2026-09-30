@@ -440,3 +440,75 @@
     :cond_end
     return-void
 .end method
+
+
+# 【维护版 r26】撤掉指定包的系统通知（清扫角标时调用）。
+# 为什么需要它：清扫只清了 Launcher 侧记忆的未读数（内存 + DB + 显示节点），
+# 而未读数的**真源是「系统里挂着的通知」**——本服务的 syncBadges() 会按
+# getActiveNotifications() 全量重算并写回（见 collectCounts）。
+# 于是清扫完只要同步一次（打开/返回别的 App 时通知监听重连走 onListenerConnected，
+# 或期间任意通知来/走），数字就按系统通知原样写回来，角标复活。
+# 撤掉真源后，再同步回来是 0，才算真正清干净。
+# 未连接 / 无该包通知 / 低版本无此 API 时静默返回，绝不抛给调用方。
+.method public static cancelForPackage(Ljava/lang/String;)V
+    .locals 5
+
+    .param p0, "pkg"    # Ljava/lang/String;
+
+    .prologue
+    :try_start
+    if-eqz p0, :cond_end
+
+    sget-object v0, Lcom/smartisanos/launcher/notification/NotificationBadgeService;->sInstance:Lcom/smartisanos/launcher/notification/NotificationBadgeService;
+
+    if-eqz v0, :cond_end
+
+    invoke-virtual {v0}, Lcom/smartisanos/launcher/notification/NotificationBadgeService;->getActiveNotifications()[Landroid/service/notification/StatusBarNotification;
+
+    move-result-object v1
+
+    if-eqz v1, :cond_end
+
+    array-length v2, v1
+
+    const/4 v3, 0x0
+
+    :goto_loop
+    if-ge v3, v2, :cond_end
+
+    aget-object v4, v1, v3
+
+    invoke-virtual {v4}, Landroid/service/notification/StatusBarNotification;->getPackageName()Ljava/lang/String;
+
+    move-result-object v4
+
+    invoke-virtual {p0, v4}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v4
+
+    if-eqz v4, :cond_next
+
+    aget-object v4, v1, v3
+
+    invoke-virtual {v4}, Landroid/service/notification/StatusBarNotification;->getKey()Ljava/lang/String;
+
+    move-result-object v4
+
+    invoke-virtual {v0, v4}, Lcom/smartisanos/launcher/notification/NotificationBadgeService;->cancelNotification(Ljava/lang/String;)V
+
+    :cond_next
+    add-int/lit8 v3, v3, 0x1
+
+    goto :goto_loop
+
+    :cond_end
+    :try_end
+    .catch Ljava/lang/Throwable; {:try_start .. :try_end} :catch_all
+
+    return-void
+
+    :catch_all
+    move-exception v1
+
+    return-void
+.end method
