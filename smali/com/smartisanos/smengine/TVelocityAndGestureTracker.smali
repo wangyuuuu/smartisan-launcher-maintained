@@ -489,14 +489,6 @@
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
-    # 【维护版 r22】整体停用本路径。
-    # 原语义 = 「多指(>=2) 且 800ms 内 >=2 个手指上移超过 250px」-> 清角标，
-    # 也就是一条「双指上滑」手势。本次把「上滑唤起搜索」从单指改成双指后，
-    # 两者方向完全重合，会导致双指上滑既打开搜索、又清除角标。
-    # 因此这里直接跳到最后返回 false（保留原代码仅作参考，不再生效）；
-    # 清角标统一由 canSweep() 负责（横向位移 > 纵向位移 + 0.15 屏宽门槛）。
-    goto :cond_4
-
     const/4 v8, 0x0
 
     .line 210
@@ -2539,24 +2531,17 @@
 
     sub-float/2addr v4, v5
 
-    # 【维护版 r21】取绝对值：左右两个方向的横扫都能触发
-    # （早期实现直接用位移比较，只有单向能触发）
-    invoke-static {v4}, Ljava/lang/Math;->abs(F)F
-
-    move-result v10
-
     sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
 
     int-to-float v5, v5
 
-    # 横向门槛 0.15 屏宽
-    const v6, 0x3e19999a    # 0.15f
+    const v6, 0x3e99999a    # 0.3f
 
     mul-float/2addr v5, v6
 
-    cmpg-float v6, v10, v5
+    cmpg-float v5, v4, v5
 
-    if-gez v6, :cond_8
+    if-gez v5, :cond_8
 
     invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getY(I)F
 
@@ -2570,13 +2555,15 @@
 
     move-result v4
 
-    # 【维护版 r22】去掉原来「纵向漂移 <= 0.15 屏宽」这道死限
-    # （用户反馈：那道限制既是「排除上滑」的逻辑、又让横扫很难触发）。
-    # 改为判定「横向位移 > 纵向位移」，即横向占主导：
-    #   - 纯上滑/下滑（含双指上滑呼出搜索）纵向占主导 -> 不置位，两条手势彻底分开
-    #   - 斜向滑动只要横向分量更大即可触发 -> 比原来容易触发
-    # 手指数不再作为条件：单指、多指横扫都能清角标（满足「比单指更多的接触面积也触发」）。
-    cmpg-float v5, v10, v4
+    sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
+
+    int-to-float v5, v5
+
+    const v6, 0x3df5c28f    # 0.12f
+
+    mul-float/2addr v5, v6
+
+    cmpl-float v5, v4, v5
 
     if-lez v5, :cond_8
 
@@ -2623,13 +2610,8 @@
     #   2) moveDistance < -0.12*屏宽（手指明显上移）：方向上与上滑完全一致，
     #      所以上滑唤起搜索时也会被判成横扫，两者互相抢手势。
     # 现改为只认「横向扫」的几何标记 mMightSweep（在 addMovement 中置位，条件为
-    # 横向位移绝对值 >= 0.15 屏宽 且 横向位移 > 纵向位移）：上滑/下滑都不会置位，
-    # 因此上滑唤起搜索（r22 起为双指）不再被横扫拦截。左右两个方向都能触发。
-    # 【r22】去掉了原「纵向漂移 <= 0.15 屏宽」的死限（那道限制既是"排除上滑"的逻辑，
-    # 也让横扫很难触发）；改用「横向 > 纵向」做方向区分，阈值更宽松，触发更自然。
-    # 同时 canSweepII（多指上滑清角标）已停用，避免与双指上滑呼出搜索冲突。
-    # 页面模式门槛沿用原实现的 sPageMode == SINGLE_PAGE_MODE（多页时不做横扫，避免抢翻页）。
-    # 手指数不设门槛：单指、多指横扫均触发。
+    # 横向位移 >= 0.30 屏宽 且 纵向漂移 <= 0.12 屏宽）：上滑/下滑都不会置位，
+    # 因此上滑唤起搜索不再被横扫拦截。
     iget-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
 
     if-nez v0, :cond_sweep_no
