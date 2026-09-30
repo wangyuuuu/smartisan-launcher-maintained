@@ -25,6 +25,14 @@
             <com.smartisanos.home.widget.sys.TipsView android:layout_marginTop="@dimen/settings_item_title_margin_top" android:text="@string/search_recent_apps_tips" style="@style/SettingItemTipsStyle" />
             <com.smartisanos.home.settings.SettingItemSwitch android:id="@+id/item_id_search_contacts" android:layout_marginTop="@dimen/settings_item_top_bottom_margin" setting:setting_item_switch_title="@string/search_contacts_label" style="@style/SettingSubItemSingleStyle" />
             <com.smartisanos.home.widget.sys.TipsView android:layout_marginTop="@dimen/settings_item_title_margin_top" android:text="@string/search_contacts_tips" style="@style/SettingItemTipsStyle" />
+            <RelativeLayout android:orientation="horizontal" android:id="@+id/setting_backup_data" android:background="@drawable/setting_item_up" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/settings_item_top_bottom_margin" android:onClick="openBackupSettings">
+                <TextView android:textSize="@dimen/setting_item_text_size" android:textColor="@drawable/more_item_color_bg" android:paddingLeft="@dimen/setting_item_text_left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/backup_restore_item_backup" android:layout_centerVertical="true" />
+                <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/setting_next" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+            </RelativeLayout>
+            <RelativeLayout android:orientation="horizontal" android:id="@+id/setting_restore_data" android:background="@drawable/setting_item_down" android:layout_width="match_parent" android:layout_height="wrap_content" android:onClick="openRestoreSettings">
+                <TextView android:textSize="@dimen/setting_item_text_size" android:textColor="@drawable/more_item_color_bg" android:paddingLeft="@dimen/setting_item_text_left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/backup_restore_item_restore" android:layout_centerVertical="true" />
+                <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/setting_next" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+            </RelativeLayout>
             <include layout="@layout/item_bottom_shadow_layout" />
         </LinearLayout>
     </ScrollView>

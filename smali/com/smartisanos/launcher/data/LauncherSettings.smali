@@ -389,7 +389,7 @@
     .line 100
     const-string v3, "launcher_mode"
 
-    const-string v4, "9"
+    const-string v4, "16"
 
     invoke-virtual {v0, v3, v4}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 
@@ -746,7 +746,7 @@
     .local v4, "noDefaultValue":I
     const-string v8, "launcher_mode"
 
-    const/16 v9, 0x9
+    const/16 v9, 0x10
 
     invoke-static {v8, v9}, Lcom/smartisanos/launcher/data/LauncherSettings;->readSetting(Ljava/lang/String;I)I
 

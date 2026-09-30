@@ -4714,7 +4714,7 @@
     .line 139
     const-string v8, "launcher_mode"
 
-    const/16 v9, 0x9
+    const/16 v9, 0x10
 
     .line 140
     invoke-direct {p0, v8, v9}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->getIntFromDB(Ljava/lang/String;I)I
@@ -4995,40 +4995,7 @@
 
     iput-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mAboutUs:Landroid/view/View;
 
-    .line 153
-    const v8, 0x7f0f0151
-
-    invoke-virtual {p0, v8}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->findViewById(I)Landroid/view/View;
-
-    move-result-object v8
-
-    check-cast v8, Landroid/widget/TextView;
-
-    iput-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mShareItem:Landroid/widget/TextView;
-
-    .line 154
-    const v8, 0x7f0f0152
-
-    invoke-virtual {p0, v8}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->findViewById(I)Landroid/view/View;
-
-    move-result-object v8
-
-    check-cast v8, Landroid/widget/RelativeLayout;
-
-    iput-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mUpdateCheck:Landroid/widget/RelativeLayout;
-
     .line 155
-    const v8, 0x7f0f0154
-
-    invoke-virtual {p0, v8}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->findViewById(I)Landroid/view/View;
-
-    move-result-object v8
-
-    check-cast v8, Landroid/widget/RelativeLayout;
-
-    iput-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mFeedback:Landroid/widget/RelativeLayout;
-
-    .line 156
     const v8, 0x7f0f0155
 
     invoke-virtual {p0, v8}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->findViewById(I)Landroid/view/View;
@@ -5151,21 +5118,6 @@
     iget-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mAboutUs:Landroid/view/View;
 
     invoke-virtual {v8, p0}, Landroid/view/View;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-
-    .line 159
-    iget-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mShareItem:Landroid/widget/TextView;
-
-    invoke-virtual {v8, p0}, Landroid/widget/TextView;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-
-    .line 160
-    iget-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mUpdateCheck:Landroid/widget/RelativeLayout;
-
-    invoke-virtual {v8, p0}, Landroid/widget/RelativeLayout;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-
-    .line 161
-    iget-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mFeedback:Landroid/widget/RelativeLayout;
-
-    invoke-virtual {v8, p0}, Landroid/widget/RelativeLayout;->setOnClickListener(Landroid/view/View$OnClickListener;)V
 
     .line 162
     iget-object v8, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mUserExper:Landroid/widget/RelativeLayout;
