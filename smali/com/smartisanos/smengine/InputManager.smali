@@ -2779,16 +2779,10 @@
 .end method
 
 .method public onSweep(Landroid/view/MotionEvent;)V
-    .locals 8
+    .locals 6
     .param p1, "event"    # Landroid/view/MotionEvent;
 
     .prologue
-    const-string v6, "SweepDbg"
-
-    const-string v7, "onSweep fired"
-
-    invoke-static {v6, v7}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
-
     const/4 v4, 0x0
 
     .line 872

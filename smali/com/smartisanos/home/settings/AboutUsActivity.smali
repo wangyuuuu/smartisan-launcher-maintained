@@ -454,56 +454,11 @@
 
     invoke-virtual {v0, v1}, Lcom/smartisanos/home/widget/sys/Title;->setBackButtonListener(Landroid/view/View$OnClickListener;)V
 
-    .line 56
-    const v1, 0x7f0f013c
-
-    invoke-virtual {p0, v1}, Lcom/smartisanos/home/settings/AboutUsActivity;->findViewById(I)Landroid/view/View;
-
-    move-result-object v1
-
-    check-cast v1, Landroid/widget/RelativeLayout;
-
-    iput-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mWeixin:Landroid/widget/RelativeLayout;
-
-    .line 57
-    const v1, 0x7f0f013d
-
-    invoke-virtual {p0, v1}, Lcom/smartisanos/home/settings/AboutUsActivity;->findViewById(I)Landroid/view/View;
-
-    move-result-object v1
-
-    check-cast v1, Landroid/widget/RelativeLayout;
-
-    iput-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mWeibo:Landroid/widget/RelativeLayout;
-
-    .line 58
-    const v1, 0x7f0f013f
-
-    invoke-virtual {p0, v1}, Lcom/smartisanos/home/settings/AboutUsActivity;->findViewById(I)Landroid/view/View;
-
-    move-result-object v1
-
-    check-cast v1, Landroid/widget/RelativeLayout;
-
-    iput-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mOfficalWeb:Landroid/widget/RelativeLayout;
-
-    .line 59
-    iget-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mWeixin:Landroid/widget/RelativeLayout;
-
-    invoke-virtual {v1, p0}, Landroid/widget/RelativeLayout;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-
-    .line 60
-    iget-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mWeibo:Landroid/widget/RelativeLayout;
-
-    invoke-virtual {v1, p0}, Landroid/widget/RelativeLayout;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-
-    .line 61
-    iget-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mOfficalWeb:Landroid/widget/RelativeLayout;
-
-    invoke-virtual {v1, p0}, Landroid/widget/RelativeLayout;->setOnClickListener(Landroid/view/View$OnClickListener;)V
-
-    .line 62
-    invoke-direct {p0}, Lcom/smartisanos/home/settings/AboutUsActivity;->updateWeiboName()V
+    # 【维护版】此处原先 findViewById(setting_follow_weixin/weibo/website) 并直接
+    # setOnClickListener、updateWeiboName()。布局里的「关注我们」模块（setting_follow_view）
+    # 已随「更多 smartisan 应用」一并移除，findViewById 会返回 null，
+    # 对 null 调 setOnClickListener/setText 会让本页一打开就 NPE 崩溃，故整段删除。
+    # （mWeixin/mWeibo/mOfficalWeb 字段保留为构造器初始化的 null，onClick 中的对应分支成为死代码。）
 
     .line 63
     iget-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mScrollView:Landroid/widget/ScrollView;

@@ -5,9 +5,6 @@
     <ScrollView android:id="@id/about_us_scrollview" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_below="@id/view_title" android:layout_alignParentBottom="true" android:overScrollMode="always">
         <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
             <ImageView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/settings_item_bottom_margin" android:src="@drawable/about_logo" android:scaleType="centerCrop" android:adjustViewBounds="true" />
-            <com.smartisan.moreapps.AppsView android:id="@id/setting_more_product" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/follow_title_top" />
-            <include layout="@layout/item_bottom_shadow_layout" />
-            <include android:layout_width="match_parent" android:layout_height="wrap_content" layout="@layout/setting_follow_view" />
             <include layout="@layout/item_bottom_shadow_layout" />
         </LinearLayout>
     </ScrollView>

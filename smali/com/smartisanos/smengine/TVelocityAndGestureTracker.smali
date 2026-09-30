@@ -2,7 +2,6 @@
 .super Ljava/lang/Object;
 .source "TVelocityAndGestureTracker.java"
 
-
 # annotations
 .annotation system Ldalvik/annotation/MemberClasses;
     value = {
@@ -13,14 +12,12 @@
     }
 .end annotation
 
-
 # static fields
 .field private static final HISTORY_SIZE:I = 0x14
 
 .field private static final TIME_EXCEED:J = 0x320L
 
 .field private static final log:Lcom/smartisanos/launcher/LOG;
-
 
 # instance fields
 .field private mCurPointId:I
@@ -49,10 +46,13 @@
 
 .field private mStartPositions:[Lcom/smartisanos/smengine/math/Vector2f;
 
+.field private mSweepDownX:F
+
+.field private mSweepDownY:F
+
 .field private mTouchSizeRecoder:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;
 
 .field private mUnits:I
-
 
 # direct methods
 .method static constructor <clinit>()V
@@ -119,6 +119,10 @@
 
     .line 41
     iput-boolean v2, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
+    iput v3, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownX:F
+
+    iput v3, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownY:F
 
     .line 44
     new-array v1, v5, [Lcom/smartisanos/smengine/TVelocityAndGestureTracker$Movement;
@@ -1006,34 +1010,43 @@
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
-    .line 107
-    iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mGestureListener:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$GestureListener;
+    iget-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
 
     if-eqz v0, :cond_0
+
+    const/4 v0, 0x1
+
+    iput-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mEnableGesture:Z
+
+    .line 107
+    :cond_0
+    iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mGestureListener:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$GestureListener;
+
+    if-eqz v0, :cond_1
 
     iget-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mEnableGesture:Z
 
-    if-eqz v0, :cond_0
+    if-eqz v0, :cond_1
 
     .line 108
     invoke-direct {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->canSwithTheme(Lcom/smartisanos/smengine/TMotionEvent;)Z
 
     move-result v0
 
-    if-eqz v0, :cond_1
+    if-eqz v0, :cond_2
 
     .line 129
-    :cond_0
+    :cond_1
     :goto_0
     return-void
 
     .line 111
-    :cond_1
+    :cond_2
     invoke-direct {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->canZoom(Lcom/smartisanos/smengine/TMotionEvent;)Z
 
     move-result v0
 
-    if-nez v0, :cond_0
+    if-nez v0, :cond_6
 
     .line 114
     invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getAction()I
@@ -1042,19 +1055,19 @@
 
     const/4 v1, 0x1
 
-    if-ne v0, v1, :cond_0
+    if-ne v0, v1, :cond_1
 
     .line 115
     invoke-virtual {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->canSweep(Lcom/smartisanos/smengine/TMotionEvent;)Z
 
     move-result v0
 
-    if-eqz v0, :cond_3
+    if-eqz v0, :cond_4
 
     .line 116
     sget-boolean v0, Lcom/smartisanos/launcher/LOG;->ENABLE_DEBUG:Z
 
-    if-eqz v0, :cond_2
+    if-eqz v0, :cond_3
 
     .line 117
     sget-object v0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->log:Lcom/smartisanos/launcher/LOG;
@@ -1066,23 +1079,23 @@
     invoke-virtual {v0, v1, v2}, Lcom/smartisanos/launcher/LOG;->error(Ljava/lang/String;Ljava/lang/String;)V
 
     .line 118
-    :cond_2
+    :cond_3
     invoke-virtual {p0}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->sweep()V
 
     goto :goto_0
 
     .line 121
-    :cond_3
+    :cond_4
     invoke-direct {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->canSweepII(Lcom/smartisanos/smengine/TMotionEvent;)Z
 
     move-result v0
 
-    if-eqz v0, :cond_0
+    if-eqz v0, :cond_1
 
     .line 122
     sget-boolean v0, Lcom/smartisanos/launcher/LOG;->ENABLE_DEBUG:Z
 
-    if-eqz v0, :cond_4
+    if-eqz v0, :cond_5
 
     .line 123
     sget-object v0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->log:Lcom/smartisanos/launcher/LOG;
@@ -1094,7 +1107,27 @@
     invoke-virtual {v0, v1, v2}, Lcom/smartisanos/launcher/LOG;->error(Ljava/lang/String;Ljava/lang/String;)V
 
     .line 124
-    :cond_4
+    :cond_5
+    invoke-virtual {p0}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->sweep()V
+
+    goto :goto_0
+
+    :cond_6
+
+    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getAction()I
+
+    move-result v0
+
+    const/4 v1, 0x1
+
+    if-ne v0, v1, :cond_1
+
+    invoke-virtual {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->canSweep(Lcom/smartisanos/smengine/TMotionEvent;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_1
+
     invoke-virtual {p0}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->sweep()V
 
     goto :goto_0
@@ -2217,7 +2250,6 @@
     goto :goto_2
 .end method
 
-
 # virtual methods
 .method public addMovement(Lcom/smartisanos/smengine/TMotionEvent;)V
     .locals 12
@@ -2249,6 +2281,20 @@
 
     .line 66
     iput-boolean v8, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mEnableGesture:Z
+
+    iput-boolean v8, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
+    invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getX(I)F
+
+    move-result v4
+
+    iput v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownX:F
+
+    invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getY(I)F
+
+    move-result v4
+
+    iput v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownY:F
 
     .line 68
     :cond_0
@@ -2401,13 +2447,6 @@
 
     aput v3, v4, v2
 
-    # 【维护版】此处曾尝试用"接触面积 > Constants.sweep_threshold/100f"置位 mMightSweep，
-    # 以点亮单指横扫 canSweep()。实测（魅族 20 Pro，2026-09-30）该机普通指尖点按上报
-    # size 就有 0.26~0.50，0.08 的门槛等于把每一次点按都判成横扫，而横扫成功会走
-    # DragLayer$1.onSweep() -> MainView.requestLockTouch(true, 280ms) 锁触摸，结果
-    # 整个桌面点不动也划不动。故暂时不置位（保持原版"永不触发"），只保留下面的实测日志，
-    # 待用真机数据（平贴按压 vs 指尖点按的 size 分布）标定出合适门槛后再打开。
-
     .line 91
     sget v4, Lcom/smartisanos/launcher/data/Constants;->sPageMode:I
 
@@ -2443,67 +2482,96 @@
 
     invoke-static {v4, v6, v7, v5, v3}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;->access$900(Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;JFF)V
 
-    # 【维护版·临时诊断】只在单页模式的按下/抬起时打印，用于标定真机的 contact size。
-    # 标定方法：普通指尖点按几次（读 size 分布）→ 指腹平贴屏幕按压/横扫几次（读 size 分布），
-    # 取二者之间取门槛。act=0 按下 / act=1 抬起。
     invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getAction()I
 
     move-result v4
 
-    new-instance v10, Ljava/lang/StringBuilder;
+    invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getX(I)F
 
-    invoke-direct {v10}, Ljava/lang/StringBuilder;-><init>()V
+    move-result v4
 
-    const-string v11, "act="
+    iget v5, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownX:F
 
-    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    sub-float/2addr v4, v5
 
-    move-result-object v10
+    invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getY(I)F
 
-    invoke-virtual {v10, v4}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+    move-result v5
 
-    move-result-object v10
+    iget v6, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownY:F
 
-    const-string v11, " size="
-
-    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v10
-
-    invoke-virtual {v10, v3}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
-
-    move-result-object v10
-
-    const-string v11, " might="
-
-    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v10
-
-    iget-boolean v11, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
-
-    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
-
-    move-result-object v10
-
-    invoke-virtual {v10}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v10
-
-    const-string v11, "SweepDbg"
-
-    invoke-static {v11, v10}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+    sub-float/2addr v5, v6
 
     .line 84
     :cond_6
     add-int/lit8 v0, v0, 0x1
 
-    goto :goto_0
+    goto/16 :goto_0
 
     .line 98
     .end local v2    # "pointId":I
     .end local v3    # "size":F
     :cond_7
+
+    sget v4, Lcom/smartisanos/launcher/data/Constants;->sPageMode:I
+
+    sget v5, Lcom/smartisanos/launcher/data/Constants;->SINGLE_PAGE_MODE:I
+
+    if-ne v4, v5, :cond_8
+
+    iget-boolean v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
+    if-nez v4, :cond_8
+
+    invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getX(I)F
+
+    move-result v4
+
+    iget v5, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownX:F
+
+    sub-float/2addr v4, v5
+
+    sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
+
+    int-to-float v5, v5
+
+    const v6, 0x3e99999a    # 0.3f
+
+    mul-float/2addr v5, v6
+
+    cmpg-float v5, v4, v5
+
+    if-gez v5, :cond_8
+
+    invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getY(I)F
+
+    move-result v4
+
+    iget v5, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownY:F
+
+    sub-float/2addr v4, v5
+
+    invoke-static {v4}, Ljava/lang/Math;->abs(F)F
+
+    move-result v4
+
+    sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
+
+    int-to-float v5, v5
+
+    const v6, 0x3df5c28f    # 0.12f
+
+    mul-float/2addr v5, v6
+
+    cmpl-float v5, v4, v5
+
+    if-lez v5, :cond_8
+
+    const/4 v4, 0x1
+
+    iput-boolean v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
+    :cond_8
     invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getPointerId(I)I
 
     move-result v4
@@ -2513,152 +2581,76 @@
     .line 99
     invoke-direct {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->computeGesture(Lcom/smartisanos/smengine/TMotionEvent;)V
 
+    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getAction()I
+
+    move-result v4
+
+    const/4 v5, 0x1
+
+    if-ne v4, v5, :cond_9
+
+    const/4 v4, 0x0
+
+    iput-boolean v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
     .line 100
+    :cond_9
     return-void
 .end method
 
 .method public canSweep(Lcom/smartisanos/smengine/TMotionEvent;)Z
-    .locals 8
+    .locals 4
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
-    const/4 v1, 0x1
+    # 【维护版】横扫（清除图标角标）判定。
+    # 原实现依赖两条老硬件时代的特征，在本机既不可用、又会与「上滑唤起搜索」打架：
+    #   1) mightSweep() -> TouchSizeRecoder 的接触面积判定：老锤子屏上报面积大，
+    #      现代屏（魅族 20 Pro）指尖与指腹的归一化面积重叠，无法区分；
+    #   2) moveDistance < -0.12*屏宽（手指明显上移）：方向上与上滑完全一致，
+    #      所以上滑唤起搜索时也会被判成横扫，两者互相抢手势。
+    # 现改为只认「横向扫」的几何标记 mMightSweep（在 addMovement 中置位，条件为
+    # 横向位移 >= 0.30 屏宽 且 纵向漂移 <= 0.12 屏宽）：上滑/下滑都不会置位，
+    # 因此上滑唤起搜索不再被横扫拦截。
+    iget-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
 
-    .line 186
-    invoke-virtual {p0, p1}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mightSweep(Lcom/smartisanos/smengine/TMotionEvent;)Z
-
-    move-result v2
-
-    if-eqz v2, :cond_1
-
-    iget-object v2, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mGestureListener:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$GestureListener;
-
-    if-eqz v2, :cond_1
-
-    .line 188
-    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getY()F
-
-    move-result v2
-
-    iget-object v3, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mTouchSizeRecoder:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;
-
-    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getEventTime()J
-
-    move-result-wide v4
-
-    invoke-static {v3, v4, v5}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;->access$1000(Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;J)F
-
-    move-result v3
-
-    sub-float v0, v2, v3
-
-    .line 189
-    .local v0, "moveDistance":F
-    const/high16 v2, -0x3e600000    # -20.0f
-
-    cmpg-float v2, v0, v2
-
-    if-gez v2, :cond_md_fail
+    if-nez v0, :cond_sweep_no
 
     .line 191
     invoke-static {}, Lcom/smartisanos/home/Launcher;->getInstance()Lcom/smartisanos/home/Launcher;
 
-    move-result-object v2
+    move-result-object v0
 
-    invoke-virtual {v2}, Lcom/smartisanos/home/Launcher;->getWindow()Landroid/view/Window;
+    invoke-virtual {v0}, Lcom/smartisanos/home/Launcher;->getWindow()Landroid/view/Window;
 
-    move-result-object v2
+    move-result-object v0
 
-    invoke-virtual {v2}, Landroid/view/Window;->getDecorView()Landroid/view/View;
+    invoke-virtual {v0}, Landroid/view/Window;->getDecorView()Landroid/view/View;
 
-    move-result-object v2
+    move-result-object v0
 
-    iget-object v3, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mScreenLocation:[I
+    iget-object v1, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mScreenLocation:[I
 
-    invoke-virtual {v2, v3}, Landroid/view/View;->getLocationOnScreen([I)V
+    invoke-virtual {v0, v1}, Landroid/view/View;->getLocationOnScreen([I)V
 
     .line 192
-    iget-object v2, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mScreenLocation:[I
+    iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mScreenLocation:[I
 
-    aget v2, v2, v1
+    const/4 v1, 0x1
 
-    if-nez v2, :cond_decor_fail
+    aget v0, v0, v1
 
-    .line 193
-    sget-boolean v2, Lcom/smartisanos/launcher/LOG;->ENABLE_DEBUG:Z
-
-    if-eqz v2, :cond_0
-
-    .line 194
-    sget-object v2, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->log:Lcom/smartisanos/launcher/LOG;
-
-    const-string v3, "DEBUG"
-
-    const-string v4, "############################ can sweep"
-
-    invoke-virtual {v2, v3, v4}, Lcom/smartisanos/launcher/LOG;->error(Ljava/lang/String;Ljava/lang/String;)V
+    if-nez v0, :cond_sweep_no
 
     .line 200
-    :cond_0
-    :goto_0
-    return v1
+    const/4 v0, 0x1
 
-    # 【维护版·临时诊断】以下两个分支 = "接触面积够大（可能横扫）但最终被否决"，
-    # 打印否决原因，便于按真机数据标定；确认无需再调后可整段删除。
-    :cond_decor_fail
-    new-instance v6, Ljava/lang/StringBuilder;
+    return v0
 
-    invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
+    :cond_sweep_no
+    const/4 v0, 0x0
 
-    const-string v7, "decorY="
-
-    invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v6
-
-    invoke-virtual {v6, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-
-    move-result-object v6
-
-    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v6
-
-    const-string v7, "SweepDbg"
-
-    invoke-static {v7, v6}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
-
-    goto :cond_1
-
-    :cond_md_fail
-    new-instance v6, Ljava/lang/StringBuilder;
-
-    invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
-
-    const-string v7, "md="
-
-    invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v6
-
-    invoke-virtual {v6, v0}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
-
-    move-result-object v6
-
-    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v6
-
-    const-string v7, "SweepDbg"
-
-    invoke-static {v7, v6}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
-
-    goto :cond_1
-
-    :cond_1
-    const/4 v1, 0x0
-
-    goto :goto_0
+    return v0
 .end method
 
 .method public computeCurrentVelocity(I)V
@@ -3104,13 +3096,6 @@
     iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mTouchSizeRecoder:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;
 
     invoke-static {v0}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;->access$1100(Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;)V
-
-    # 【维护版·临时诊断】扫描判定通过，准备回调 onSweep
-    const-string v1, "SweepDbg"
-
-    const-string v2, "canSweep=true -> sweep()"
-
-    invoke-static {v1, v2}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
 
     .line 205
     iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mGestureListener:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$GestureListener;

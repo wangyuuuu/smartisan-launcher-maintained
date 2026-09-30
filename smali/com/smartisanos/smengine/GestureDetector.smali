@@ -688,7 +688,7 @@
 .end method
 
 .method private resetSweep(Landroid/view/MotionEvent;)Z
-    .locals 6
+    .locals 5
     .param p1, "event"    # Landroid/view/MotionEvent;
 
     .prologue
@@ -748,32 +748,6 @@
     invoke-virtual {p1, v0}, Landroid/view/MotionEvent;->getSize(I)F
 
     move-result v2
-
-    new-instance v5, Ljava/lang/StringBuilder;
-
-    invoke-direct {v5}, Ljava/lang/StringBuilder;-><init>()V
-
-    const-string v3, "downSize="
-
-    invoke-virtual {v5, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v5, v2}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
-
-    const-string v3, " thr="
-
-    invoke-virtual {v5, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    iget v3, p0, Lcom/smartisanos/smengine/GestureDetector;->mSweepThreshold:F
-
-    invoke-virtual {v5, v3}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v5}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v3
-
-    const-string v5, "SweepDbg"
-
-    invoke-static {v5, v3}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
 
     iget v3, p0, Lcom/smartisanos/smengine/GestureDetector;->mSweepThreshold:F
 
