@@ -2531,11 +2531,18 @@
 
     sub-float/2addr v4, v5
 
+    # 【维护版 r21】取绝对值：左右两个方向的横扫都能触发
+    # （早期实现直接用位移比较，只有单向能触发）
+    invoke-static {v4}, Ljava/lang/Math;->abs(F)F
+
+    move-result v4
+
     sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
 
     int-to-float v5, v5
 
-    const v6, 0x3e99999a    # 0.3f
+    # 【维护版 r21】横向门槛 0.30 -> 0.15 屏宽，让横扫更容易触发
+    const v6, 0x3e19999a    # 0.15f
 
     mul-float/2addr v5, v6
 
@@ -2559,7 +2566,8 @@
 
     int-to-float v5, v5
 
-    const v6, 0x3df5c28f    # 0.12f
+    # 【维护版 r21】纵向容差 0.12 -> 0.15 屏宽（与横向门槛同值，保证横扫占主导）
+    const v6, 0x3e19999a    # 0.15f
 
     mul-float/2addr v5, v6
 
@@ -2610,8 +2618,9 @@
     #   2) moveDistance < -0.12*屏宽（手指明显上移）：方向上与上滑完全一致，
     #      所以上滑唤起搜索时也会被判成横扫，两者互相抢手势。
     # 现改为只认「横向扫」的几何标记 mMightSweep（在 addMovement 中置位，条件为
-    # 横向位移 >= 0.30 屏宽 且 纵向漂移 <= 0.12 屏宽）：上滑/下滑都不会置位，
-    # 因此上滑唤起搜索不再被横扫拦截。
+    # 横向位移绝对值 >= 0.15 屏宽 且 纵向漂移 <= 0.15 屏宽）：上滑/下滑都不会置位，
+    # 因此上滑唤起搜索不再被横扫拦截。左右两个方向都能触发。
+    # 页面模式门槛沿用原实现的 sPageMode == SINGLE_PAGE_MODE（多页时不做横扫，避免抢翻页）。
     iget-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
 
     if-nez v0, :cond_sweep_no
