@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
+import android.provider.DocumentsContract;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -30,10 +32,13 @@ import java.util.zip.ZipOutputStream;
 /**
  * 桌面数据备份与还原。
  * 备份：把应用私有目录下的 shared_prefs/ 与 databases/（全部设置项 + 桌面布局/排列）
- * 打包为 zip，通过系统文件选择器（SAF）保存到用户指定的位置，卸载重装后不丢。
+ * 打包为 zip。先写入本地临时文件并校验，再拷贝到 SAF 目标位置，避免留下空文件；
+ * 失败时删除半成品文档。全程 Log.e 记录，便于 adb logcat 排障。
  * 还原：选择备份 zip，覆盖当前数据后自动重启桌面进程使其生效。
  */
 public class LauncherBackupRestore {
+
+    private static final String TAG = "LauncherBackup";
 
     public static final int REQUEST_BACKUP = 5111;
     public static final int REQUEST_RESTORE = 5112;
@@ -44,6 +49,7 @@ public class LauncherBackupRestore {
 
     public static void startBackup(Activity activity) {
         try {
+            Log.i(TAG, "startBackup");
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("application/zip");
@@ -53,6 +59,7 @@ public class LauncherBackupRestore {
         } catch (ActivityNotFoundException e) {
             toast(activity, "未找到系统文件选择器");
         } catch (Throwable t) {
+            Log.e(TAG, "startBackup failed", t);
             toast(activity, getString(activity, "backup_restore_failed", "操作失败"));
         }
     }
@@ -72,6 +79,7 @@ public class LauncherBackupRestore {
                                 intent.setType("application/zip");
                                 activity.startActivityForResult(intent, REQUEST_RESTORE);
                             } catch (Throwable t) {
+                                Log.e(TAG, "startRestore picker failed", t);
                                 toast(activity, getString(activity, "backup_restore_failed", "操作失败"));
                             }
                         }
@@ -79,6 +87,7 @@ public class LauncherBackupRestore {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         } catch (Throwable t) {
+            Log.e(TAG, "startRestore dialog failed", t);
             toast(activity, getString(activity, "backup_restore_failed", "操作失败"));
         }
     }
@@ -92,10 +101,12 @@ public class LauncherBackupRestore {
         if (!backup && requestCode != REQUEST_RESTORE) {
             return false;
         }
+        Log.i(TAG, "handleActivityResult req=" + requestCode + " result=" + resultCode);
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) {
             return true; // 用户取消，静默返回
         }
         final Uri uri = data.getData();
+        Log.i(TAG, "uri=" + uri);
         toast(activity, getString(activity, "backup_restore_working", "正在处理…"));
         new Thread(new Runnable() {
             @Override
@@ -103,13 +114,19 @@ public class LauncherBackupRestore {
                 try {
                     if (backup) {
                         doBackup(activity, uri);
+                        Log.i(TAG, "backup done");
                         postToast(activity, getString(activity, "backup_restore_backup_done", "备份完成"));
                     } else {
                         doRestore(activity, uri);
+                        Log.i(TAG, "restore done, restarting");
                         postToast(activity, getString(activity, "backup_restore_restore_done", "还原完成，正在重启桌面…"));
                         scheduleRestart(activity);
                     }
                 } catch (Throwable t) {
+                    Log.e(TAG, (backup ? "backup" : "restore") + " failed", t);
+                    if (backup) {
+                        deleteDocumentQuietly(activity.getApplicationContext(), uri);
+                    }
                     postToast(activity, getString(activity, "backup_restore_failed", "操作失败"));
                 }
             }
@@ -121,28 +138,84 @@ public class LauncherBackupRestore {
 
     private static void doBackup(Activity activity, Uri dest) throws IOException {
         Context c = activity.getApplicationContext();
-        File dataDir = c.getFilesDir().getParentFile();
-        int count = 0;
-        OutputStream os = c.getContentResolver().openOutputStream(dest);
-        if (os == null) throw new IOException("openOutputStream failed");
-        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(os, 1 << 16));
+        // 1) 先打包到本地临时文件
+        File tmp = new File(c.getCacheDir(), "launcher_backup_tmp.zip");
+        tmp.delete();
+        int count;
+        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(tmp), 1 << 16));
         try {
-            count += zipDir(zos, new File(dataDir, DIR_PREFS), DIR_PREFS);
-            count += zipDir(zos, new File(dataDir, DIR_DB), DIR_DB);
+            int dbCount = zipDir(zos, resolveDir(c, DIR_DB), DIR_DB);
+            int prefCount = zipDir(zos, resolveDir(c, DIR_PREFS), DIR_PREFS);
+            count = dbCount + prefCount;
+            Log.i(TAG, "zipped files: databases=" + dbCount + " shared_prefs=" + prefCount);
         } finally {
             try {
                 zos.close();
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                Log.e(TAG, "close tmp zip", e);
             }
         }
-        if (count == 0) {
-            throw new IOException("no data backed up");
+        if (count == 0 || tmp.length() == 0) {
+            long len = tmp.length();
+            tmp.delete();
+            throw new IOException("no data backed up (count=" + count + ", tmpLen=" + len + ")");
         }
+        Log.i(TAG, "tmp zip size=" + tmp.length());
+        // 2) 校验通过后拷贝到 SAF 目标
+        OutputStream os = null;
+        try {
+            os = c.getContentResolver().openOutputStream(dest);
+            if (os == null) throw new IOException("openOutputStream returned null");
+            InputStream in = new BufferedInputStream(new FileInputStream(tmp), 1 << 16);
+            try {
+                byte[] buf = new byte[1 << 16];
+                int r;
+                while ((r = in.read(buf)) != -1) {
+                    os.write(buf, 0, r);
+                }
+                os.flush();
+            } finally {
+                in.close();
+            }
+            Log.i(TAG, "copied to saf target");
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException ignored) {
+                }
+            }
+            tmp.delete();
+        }
+    }
+
+    /**
+     * 解析数据目录：优先 ApplicationInfo.dataDir（权威），回退 filesDir 父目录，
+     * databases 再回退 getDatabasePath 的父目录。全部未命中时打日志并返回第一个候选。
+     */
+    private static File resolveDir(Context c, String name) {
+        File f1 = new File(c.getApplicationInfo().dataDir, name);
+        if (f1.isDirectory()) return f1;
+        File parent = c.getFilesDir().getParentFile();
+        File f2 = parent != null ? new File(parent, name) : null;
+        if (f2 != null && f2.isDirectory()) return f2;
+        if (DIR_DB.equals(name)) {
+            File db = c.getDatabasePath("probe.db");
+            File f3 = db.getParentFile();
+            if (f3 != null && f3.isDirectory()) return f3;
+        }
+        Log.e(TAG, "resolveDir: '" + name + "' not found. tried: " + f1 + ", " + f2);
+        return f1;
     }
 
     private static int zipDir(ZipOutputStream zos, File dir, String entryPrefix) throws IOException {
         File[] files = dir.listFiles();
-        if (files == null) return 0;
+        if (files == null) {
+            Log.e(TAG, "zipDir: listFiles null for " + dir);
+            return 0;
+        }
         int count = 0;
         byte[] buf = new byte[1 << 16];
         for (int i = 0; i < files.length; i++) {
@@ -173,7 +246,7 @@ public class LauncherBackupRestore {
      */
     private static int doRestore(Activity activity, Uri source) throws IOException {
         Context c = activity.getApplicationContext();
-        File dataDir = c.getFilesDir().getParentFile();
+        File dataDir = new File(c.getApplicationInfo().dataDir);
         File staging = new File(c.getCacheDir(), "launcher_restore_staging");
         deleteRecursively(staging);
         if (!staging.mkdirs() && !staging.isDirectory()) {
@@ -214,10 +287,11 @@ public class LauncherBackupRestore {
         }
         if (count == 0) {
             deleteRecursively(staging);
-            throw new IOException("invalid backup file");
+            throw new IOException("invalid backup file (0 entries)");
         }
-        applyStaged(staging, new File(dataDir, DIR_PREFS));
-        applyStaged(staging, new File(dataDir, DIR_DB));
+        Log.i(TAG, "staged " + count + " files, applying");
+        applyStaged(staging, resolveDir(c, DIR_PREFS));
+        applyStaged(staging, resolveDir(c, DIR_DB));
         deleteRecursively(staging);
         return count;
     }
@@ -226,7 +300,10 @@ public class LauncherBackupRestore {
         File sub = new File(stagingDir, targetDir.getName());
         File[] files = sub.listFiles();
         if (files == null || files.length == 0) return;
-        if (!targetDir.isDirectory() && !targetDir.mkdirs()) return;
+        if (!targetDir.isDirectory() && !targetDir.mkdirs()) {
+            Log.e(TAG, "applyStaged: mkdir failed " + targetDir);
+            return;
+        }
         for (int i = 0; i < files.length; i++) {
             File src = files[i];
             File dst = new File(targetDir, src.getName());
@@ -260,7 +337,8 @@ public class LauncherBackupRestore {
             } finally {
                 in.close();
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            Log.e(TAG, "copyFile failed " + src + " -> " + dst, e);
         }
     }
 
@@ -286,6 +364,15 @@ public class LauncherBackupRestore {
     }
 
     // ---------- 工具 ----------
+
+    private static void deleteDocumentQuietly(Context c, Uri uri) {
+        try {
+            DocumentsContract.deleteDocument(c.getContentResolver(), uri);
+            Log.i(TAG, "deleted incomplete document: " + uri);
+        } catch (Throwable t) {
+            Log.e(TAG, "deleteDocument failed", t);
+        }
+    }
 
     private static void deleteRecursively(File f) {
         if (f == null || !f.exists()) return;

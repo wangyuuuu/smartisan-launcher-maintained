@@ -14,12 +14,14 @@
 
 .field private static final RESTART_DELAY_MS:J = 0x5dcL
 
+.field private static final TAG:Ljava/lang/String; = "LauncherBackup"
+
 
 # direct methods
 .method public constructor <init>()V
     .registers 1
 
-    .line 36
+    .line 39
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     return-void
@@ -28,7 +30,7 @@
 .method static synthetic access$000(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
     .registers 3
 
-    .line 36
+    .line 39
     invoke-static {p0, p1, p2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->getString(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object p0
@@ -39,7 +41,7 @@
 .method static synthetic access$100(Landroid/app/Activity;Ljava/lang/String;)V
     .registers 2
 
-    .line 36
+    .line 39
     invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->toast(Landroid/app/Activity;Ljava/lang/String;)V
 
     return-void
@@ -53,7 +55,7 @@
         }
     .end annotation
 
-    .line 36
+    .line 39
     invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->doBackup(Landroid/app/Activity;Landroid/net/Uri;)V
 
     return-void
@@ -62,7 +64,7 @@
 .method static synthetic access$300(Landroid/app/Activity;Ljava/lang/String;)V
     .registers 2
 
-    .line 36
+    .line 39
     invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->postToast(Landroid/app/Activity;Ljava/lang/String;)V
 
     return-void
@@ -76,7 +78,7 @@
         }
     .end annotation
 
-    .line 36
+    .line 39
     invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->doRestore(Landroid/app/Activity;Landroid/net/Uri;)I
 
     move-result p0
@@ -87,8 +89,17 @@
 .method static synthetic access$500(Landroid/app/Activity;)V
     .registers 1
 
-    .line 36
+    .line 39
     invoke-static {p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->scheduleRestart(Landroid/app/Activity;)V
+
+    return-void
+.end method
+
+.method static synthetic access$600(Landroid/content/Context;Landroid/net/Uri;)V
+    .registers 2
+
+    .line 39
+    invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteDocumentQuietly(Landroid/content/Context;Landroid/net/Uri;)V
 
     return-void
 .end method
@@ -96,7 +107,7 @@
 .method private static applyStaged(Ljava/io/File;Ljava/io/File;)V
     .registers 8
 
-    .line 226
+    .line 300
     new-instance v0, Ljava/io/File;
 
     invoke-virtual {p1}, Ljava/io/File;->getName()Ljava/lang/String;
@@ -105,49 +116,68 @@
 
     invoke-direct {v0, p0, v1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 227
+    .line 301
     invoke-virtual {v0}, Ljava/io/File;->listFiles()[Ljava/io/File;
 
     move-result-object p0
 
-    if-eqz p0, :cond_8c
+    if-eqz p0, :cond_a0
 
-    .line 228
+    .line 302
     array-length v0, p0
 
     if-nez v0, :cond_14
 
-    goto/16 :goto_8c
+    goto/16 :goto_a0
 
-    .line 229
+    .line 303
     :cond_14
     invoke-virtual {p1}, Ljava/io/File;->isDirectory()Z
 
     move-result v0
 
-    if-nez v0, :cond_21
+    if-nez v0, :cond_35
 
     invoke-virtual {p1}, Ljava/io/File;->mkdirs()Z
 
     move-result v0
 
-    if-nez v0, :cond_21
+    if-nez v0, :cond_35
+
+    .line 304
+    new-instance p0, Ljava/lang/StringBuilder;
+
+    const-string v0, "applyStaged: mkdir failed "
+
+    invoke-direct {p0, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    const-string p1, "LauncherBackup"
+
+    invoke-static {p1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
 
     return-void
 
-    :cond_21
+    :cond_35
     const/4 v0, 0x0
 
-    .line 230
-    :goto_22
+    .line 307
+    :goto_36
     array-length v1, p0
 
-    if-ge v0, v1, :cond_8c
+    if-ge v0, v1, :cond_a0
 
-    .line 231
+    .line 308
     aget-object v1, p0, v0
 
-    .line 232
+    .line 309
     new-instance v2, Ljava/io/File;
 
     invoke-virtual {v1}, Ljava/io/File;->getName()Ljava/lang/String;
@@ -156,7 +186,7 @@
 
     invoke-direct {v2, p1, v3}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 233
+    .line 310
     invoke-virtual {v1}, Ljava/io/File;->getName()Ljava/lang/String;
 
     move-result-object v3
@@ -167,9 +197,9 @@
 
     move-result v3
 
-    if-eqz v3, :cond_7a
+    if-eqz v3, :cond_8e
 
-    .line 235
+    .line 312
     new-instance v3, Ljava/io/File;
 
     new-instance v4, Ljava/lang/StringBuilder;
@@ -198,7 +228,7 @@
 
     invoke-virtual {v3}, Ljava/io/File;->delete()Z
 
-    .line 236
+    .line 313
     new-instance v3, Ljava/io/File;
 
     new-instance v4, Ljava/lang/StringBuilder;
@@ -227,37 +257,37 @@
 
     invoke-virtual {v3}, Ljava/io/File;->delete()Z
 
-    .line 238
-    :cond_7a
+    .line 315
+    :cond_8e
     invoke-virtual {v2}, Ljava/io/File;->delete()Z
 
-    .line 239
+    .line 316
     invoke-virtual {v1, v2}, Ljava/io/File;->renameTo(Ljava/io/File;)Z
 
     move-result v3
 
-    if-nez v3, :cond_89
+    if-nez v3, :cond_9d
 
-    .line 240
+    .line 317
     invoke-static {v1, v2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->copyFile(Ljava/io/File;Ljava/io/File;)V
 
-    .line 241
+    .line 318
     invoke-virtual {v1}, Ljava/io/File;->delete()Z
 
-    :cond_89
+    :cond_9d
     add-int/lit8 v0, v0, 0x1
 
-    goto :goto_22
+    goto :goto_36
 
-    :cond_8c
-    :goto_8c
+    :cond_a0
+    :goto_a0
     return-void
 .end method
 
 .method private static copyFile(Ljava/io/File;Ljava/io/File;)V
-    .registers 5
+    .registers 7
 
-    .line 248
+    .line 325
     :try_start_0
     new-instance v0, Ljava/io/BufferedInputStream;
 
@@ -265,88 +295,167 @@
 
     invoke-direct {v1, p0}, Ljava/io/FileInputStream;-><init>(Ljava/io/File;)V
 
-    const/high16 p0, 0x10000
+    const/high16 v2, 0x10000
 
-    invoke-direct {v0, v1, p0}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
+    invoke-direct {v0, v1, v2}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
     :try_end_c
     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_c} :catch_35
 
-    .line 250
+    .line 327
     :try_start_c
     new-instance v1, Ljava/io/BufferedOutputStream;
 
-    new-instance v2, Ljava/io/FileOutputStream;
+    new-instance v3, Ljava/io/FileOutputStream;
 
-    invoke-direct {v2, p1}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
+    invoke-direct {v3, p1}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
 
-    invoke-direct {v1, v2, p0}, Ljava/io/BufferedOutputStream;-><init>(Ljava/io/OutputStream;I)V
+    invoke-direct {v1, v3, v2}, Ljava/io/BufferedOutputStream;-><init>(Ljava/io/OutputStream;I)V
     :try_end_16
     .catchall {:try_start_c .. :try_end_16} :catchall_30
 
-    .line 252
+    .line 329
     :try_start_16
-    new-array p0, p0, [B
+    new-array v2, v2, [B
 
-    .line 254
+    .line 331
     :goto_18
-    invoke-virtual {v0, p0}, Ljava/io/InputStream;->read([B)I
+    invoke-virtual {v0, v2}, Ljava/io/InputStream;->read([B)I
 
-    move-result p1
+    move-result v3
 
-    const/4 v2, -0x1
+    const/4 v4, -0x1
 
-    if-eq p1, v2, :cond_24
+    if-eq v3, v4, :cond_24
 
-    const/4 v2, 0x0
+    const/4 v4, 0x0
 
-    .line 255
-    invoke-virtual {v1, p0, v2, p1}, Ljava/io/OutputStream;->write([BII)V
+    .line 332
+    invoke-virtual {v1, v2, v4, v3}, Ljava/io/OutputStream;->write([BII)V
     :try_end_23
     .catchall {:try_start_16 .. :try_end_23} :catchall_2b
 
     goto :goto_18
 
-    .line 258
+    .line 335
     :cond_24
     :try_start_24
     invoke-virtual {v1}, Ljava/io/OutputStream;->close()V
     :try_end_27
     .catchall {:try_start_24 .. :try_end_27} :catchall_30
 
-    .line 261
+    .line 338
     :try_start_27
     invoke-virtual {v0}, Ljava/io/InputStream;->close()V
     :try_end_2a
     .catch Ljava/io/IOException; {:try_start_27 .. :try_end_2a} :catch_35
 
-    goto :goto_35
+    goto :goto_54
 
     :catchall_2b
-    move-exception p0
+    move-exception v2
 
-    .line 258
+    .line 335
     :try_start_2c
     invoke-virtual {v1}, Ljava/io/OutputStream;->close()V
 
-    .line 259
-    throw p0
+    .line 336
+    throw v2
     :try_end_30
     .catchall {:try_start_2c .. :try_end_30} :catchall_30
 
     :catchall_30
-    move-exception p0
+    move-exception v1
 
-    .line 261
+    .line 338
     :try_start_31
     invoke-virtual {v0}, Ljava/io/InputStream;->close()V
 
-    .line 262
-    throw p0
+    .line 339
+    throw v1
     :try_end_35
     .catch Ljava/io/IOException; {:try_start_31 .. :try_end_35} :catch_35
 
     :catch_35
-    :goto_35
+    move-exception v0
+
+    .line 341
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    const-string v2, "copyFile failed "
+
+    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v1, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    const-string v1, " -> "
+
+    invoke-virtual {p0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    const-string p1, "LauncherBackup"
+
+    invoke-static {p1, p0, v0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    :goto_54
+    return-void
+.end method
+
+.method private static deleteDocumentQuietly(Landroid/content/Context;Landroid/net/Uri;)V
+    .registers 4
+
+    .line 370
+    const-string v0, "LauncherBackup"
+
+    .line 0
+    const-string v1, "deleted incomplete document: "
+
+    .line 370
+    :try_start_4
+    invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
+
+    move-result-object p0
+
+    invoke-static {p0, p1}, Landroid/provider/DocumentsContract;->deleteDocument(Landroid/content/ContentResolver;Landroid/net/Uri;)Z
+
+    .line 371
+    new-instance p0, Ljava/lang/StringBuilder;
+
+    invoke-direct {p0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-static {v0, p0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+    :try_end_1b
+    .catchall {:try_start_4 .. :try_end_1b} :catchall_1c
+
+    goto :goto_22
+
+    :catchall_1c
+    move-exception p0
+
+    .line 373
+    const-string p1, "deleteDocument failed"
+
+    invoke-static {v0, p1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    :goto_22
     return-void
 .end method
 
@@ -355,7 +464,7 @@
 
     if-eqz p0, :cond_1e
 
-    .line 291
+    .line 378
     invoke-virtual {p0}, Ljava/io/File;->exists()Z
 
     move-result v0
@@ -364,7 +473,7 @@
 
     goto :goto_1e
 
-    .line 292
+    .line 379
     :cond_9
     invoke-virtual {p0}, Ljava/io/File;->listFiles()[Ljava/io/File;
 
@@ -374,13 +483,13 @@
 
     const/4 v1, 0x0
 
-    .line 294
+    .line 381
     :goto_10
     array-length v2, v0
 
     if-ge v1, v2, :cond_1b
 
-    .line 295
+    .line 382
     aget-object v2, v0, v1
 
     invoke-static {v2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
@@ -389,7 +498,7 @@
 
     goto :goto_10
 
-    .line 298
+    .line 385
     :cond_1b
     invoke-virtual {p0}, Ljava/io/File;->delete()Z
 
@@ -399,123 +508,355 @@
 .end method
 
 .method private static doBackup(Landroid/app/Activity;Landroid/net/Uri;)V
-    .registers 7
+    .registers 14
     .annotation system Ldalvik/annotation/Throws;
         value = {
             Ljava/io/IOException;
         }
     .end annotation
 
-    .line 123
-    const-string v0, "databases"
+    .line 140
+    const-string v0, "close tmp zip"
 
     const-string v1, "shared_prefs"
 
+    const-string v2, "databases"
+
+    const-string v3, "LauncherBackup"
+
+    .line 0
+    const-string v4, "zipped files: databases="
+
+    .line 140
     invoke-virtual {p0}, Landroid/app/Activity;->getApplicationContext()Landroid/content/Context;
 
     move-result-object p0
 
-    .line 124
-    invoke-virtual {p0}, Landroid/content/Context;->getFilesDir()Ljava/io/File;
+    .line 142
+    new-instance v5, Ljava/io/File;
+
+    invoke-virtual {p0}, Landroid/content/Context;->getCacheDir()Ljava/io/File;
+
+    move-result-object v6
+
+    const-string v7, "launcher_backup_tmp.zip"
+
+    invoke-direct {v5, v6, v7}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+
+    .line 143
+    invoke-virtual {v5}, Ljava/io/File;->delete()Z
+
+    .line 145
+    new-instance v6, Ljava/util/zip/ZipOutputStream;
+
+    new-instance v7, Ljava/io/BufferedOutputStream;
+
+    new-instance v8, Ljava/io/FileOutputStream;
+
+    invoke-direct {v8, v5}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
+
+    const/high16 v9, 0x10000
+
+    invoke-direct {v7, v8, v9}, Ljava/io/BufferedOutputStream;-><init>(Ljava/io/OutputStream;I)V
+
+    invoke-direct {v6, v7}, Ljava/util/zip/ZipOutputStream;-><init>(Ljava/io/OutputStream;)V
+
+    .line 147
+    :try_start_2d
+    invoke-static {p0, v2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->resolveDir(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
+
+    move-result-object v7
+
+    invoke-static {v6, v7, v2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->zipDir(Ljava/util/zip/ZipOutputStream;Ljava/io/File;Ljava/lang/String;)I
+
+    move-result v2
+
+    .line 148
+    invoke-static {p0, v1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->resolveDir(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
+
+    move-result-object v7
+
+    invoke-static {v6, v7, v1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->zipDir(Ljava/util/zip/ZipOutputStream;Ljava/io/File;Ljava/lang/String;)I
+
+    move-result v1
+
+    add-int v7, v2, v1
+
+    .line 150
+    new-instance v8, Ljava/lang/StringBuilder;
+
+    invoke-direct {v8, v4}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v8, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
 
     move-result-object v2
 
-    invoke-virtual {v2}, Ljava/io/File;->getParentFile()Ljava/io/File;
+    const-string v4, " shared_prefs="
+
+    invoke-virtual {v2, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
     move-result-object v2
 
-    .line 126
+    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-static {v3, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+    :try_end_59
+    .catchall {:try_start_2d .. :try_end_59} :catchall_100
+
+    .line 153
+    :try_start_59
+    invoke-virtual {v6}, Ljava/util/zip/ZipOutputStream;->close()V
+    :try_end_5c
+    .catch Ljava/io/IOException; {:try_start_59 .. :try_end_5c} :catch_5d
+
+    goto :goto_61
+
+    :catch_5d
+    move-exception v1
+
+    .line 155
+    invoke-static {v3, v0, v1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    :goto_61
+    if-eqz v7, :cond_d4
+
+    .line 158
+    invoke-virtual {v5}, Ljava/io/File;->length()J
+
+    move-result-wide v0
+
+    const-wide/16 v10, 0x0
+
+    cmp-long v2, v0, v10
+
+    if-eqz v2, :cond_d4
+
+    .line 163
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    const-string v1, "tmp zip size="
+
+    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v5}, Ljava/io/File;->length()J
+
+    move-result-wide v1
+
+    invoke-virtual {v0, v1, v2}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    move-result-object v0
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v0
+
+    invoke-static {v3, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    const/4 v0, 0x0
+
+    .line 167
+    :try_start_84
     invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
 
     move-result-object p0
 
     invoke-virtual {p0, p1}, Landroid/content/ContentResolver;->openOutputStream(Landroid/net/Uri;)Ljava/io/OutputStream;
 
-    move-result-object p0
+    move-result-object v0
 
-    if-eqz p0, :cond_4e
+    if-eqz v0, :cond_bf
 
-    .line 128
-    new-instance p1, Ljava/util/zip/ZipOutputStream;
+    .line 169
+    new-instance p0, Ljava/io/BufferedInputStream;
 
-    new-instance v3, Ljava/io/BufferedOutputStream;
+    new-instance p1, Ljava/io/FileInputStream;
 
-    const/high16 v4, 0x10000
+    invoke-direct {p1, v5}, Ljava/io/FileInputStream;-><init>(Ljava/io/File;)V
 
-    invoke-direct {v3, p0, v4}, Ljava/io/BufferedOutputStream;-><init>(Ljava/io/OutputStream;I)V
+    invoke-direct {p0, p1, v9}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
+    :try_end_98
+    .catch Ljava/io/IOException; {:try_start_84 .. :try_end_98} :catch_c9
+    .catchall {:try_start_84 .. :try_end_98} :catchall_c7
 
-    invoke-direct {p1, v3}, Ljava/util/zip/ZipOutputStream;-><init>(Ljava/io/OutputStream;)V
+    .line 171
+    :try_start_98
+    new-array p1, v9, [B
 
-    .line 130
-    :try_start_26
-    new-instance p0, Ljava/io/File;
+    .line 173
+    :goto_9a
+    invoke-virtual {p0, p1}, Ljava/io/InputStream;->read([B)I
 
-    invoke-direct {p0, v2, v1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+    move-result v1
 
-    invoke-static {p1, p0, v1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->zipDir(Ljava/util/zip/ZipOutputStream;Ljava/io/File;Ljava/lang/String;)I
+    const/4 v2, -0x1
 
-    move-result p0
+    if-eq v1, v2, :cond_a6
 
-    .line 131
-    new-instance v1, Ljava/io/File;
+    const/4 v2, 0x0
 
-    invoke-direct {v1, v2, v0}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+    .line 174
+    invoke-virtual {v0, p1, v2, v1}, Ljava/io/OutputStream;->write([BII)V
 
-    invoke-static {p1, v1, v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->zipDir(Ljava/util/zip/ZipOutputStream;Ljava/io/File;Ljava/lang/String;)I
+    goto :goto_9a
 
-    move-result v0
-    :try_end_38
-    .catchall {:try_start_26 .. :try_end_38} :catchall_49
+    .line 176
+    :cond_a6
+    invoke-virtual {v0}, Ljava/io/OutputStream;->flush()V
+    :try_end_a9
+    .catchall {:try_start_98 .. :try_end_a9} :catchall_ba
 
-    add-int/2addr p0, v0
+    .line 178
+    :try_start_a9
+    invoke-virtual {p0}, Ljava/io/InputStream;->close()V
 
-    .line 134
-    :try_start_39
-    invoke-virtual {p1}, Ljava/util/zip/ZipOutputStream;->close()V
-    :try_end_3c
-    .catch Ljava/io/IOException; {:try_start_39 .. :try_end_3c} :catch_3d
+    .line 180
+    const-string p0, "copied to saf target"
 
-    goto :goto_3e
+    invoke-static {v3, p0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+    :try_end_b1
+    .catch Ljava/io/IOException; {:try_start_a9 .. :try_end_b1} :catch_c9
+    .catchall {:try_start_a9 .. :try_end_b1} :catchall_c7
 
-    :catch_3d
-    nop
+    if-eqz v0, :cond_b6
 
-    :goto_3e
-    if-eqz p0, :cond_41
+    .line 186
+    :try_start_b3
+    invoke-virtual {v0}, Ljava/io/OutputStream;->close()V
+    :try_end_b6
+    .catch Ljava/io/IOException; {:try_start_b3 .. :try_end_b6} :catch_b6
+
+    .line 190
+    :catch_b6
+    :cond_b6
+    invoke-virtual {v5}, Ljava/io/File;->delete()Z
 
     return-void
 
-    .line 139
-    :cond_41
+    :catchall_ba
+    move-exception p1
+
+    .line 178
+    :try_start_bb
+    invoke-virtual {p0}, Ljava/io/InputStream;->close()V
+
+    .line 179
+    throw p1
+
+    .line 168
+    :cond_bf
     new-instance p0, Ljava/io/IOException;
 
-    const-string p1, "no data backed up"
+    const-string p1, "openOutputStream returned null"
 
     invoke-direct {p0, p1}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
 
     throw p0
+    :try_end_c7
+    .catch Ljava/io/IOException; {:try_start_bb .. :try_end_c7} :catch_c9
+    .catchall {:try_start_bb .. :try_end_c7} :catchall_c7
 
-    :catchall_49
+    :catchall_c7
     move-exception p0
 
-    .line 134
-    :try_start_4a
-    invoke-virtual {p1}, Ljava/util/zip/ZipOutputStream;->close()V
-    :try_end_4d
-    .catch Ljava/io/IOException; {:try_start_4a .. :try_end_4d} :catch_4d
+    goto :goto_cb
 
-    .line 137
-    :catch_4d
+    :catch_c9
+    move-exception p0
+
+    .line 182
+    :try_start_ca
+    throw p0
+    :try_end_cb
+    .catchall {:try_start_ca .. :try_end_cb} :catchall_c7
+
+    :goto_cb
+    if-eqz v0, :cond_d0
+
+    .line 186
+    :try_start_cd
+    invoke-virtual {v0}, Ljava/io/OutputStream;->close()V
+    :try_end_d0
+    .catch Ljava/io/IOException; {:try_start_cd .. :try_end_d0} :catch_d0
+
+    .line 190
+    :catch_d0
+    :cond_d0
+    invoke-virtual {v5}, Ljava/io/File;->delete()Z
+
+    .line 191
     throw p0
 
-    .line 127
-    :cond_4e
-    new-instance p0, Ljava/io/IOException;
+    .line 159
+    :cond_d4
+    invoke-virtual {v5}, Ljava/io/File;->length()J
 
-    const-string p1, "openOutputStream failed"
+    move-result-wide p0
 
-    invoke-direct {p0, p1}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
+    .line 160
+    invoke-virtual {v5}, Ljava/io/File;->delete()Z
 
+    .line 161
+    new-instance v0, Ljava/io/IOException;
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    const-string v2, "no data backed up (count="
+
+    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v1, v7}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    const-string v2, ", tmpLen="
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    invoke-virtual {v1, p0, p1}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    const-string p1, ")"
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    invoke-direct {v0, p0}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
+
+    throw v0
+
+    :catchall_100
+    move-exception p0
+
+    .line 153
+    :try_start_101
+    invoke-virtual {v6}, Ljava/util/zip/ZipOutputStream;->close()V
+    :try_end_104
+    .catch Ljava/io/IOException; {:try_start_101 .. :try_end_104} :catch_105
+
+    goto :goto_109
+
+    :catch_105
+    move-exception p1
+
+    .line 155
+    invoke-static {v3, v0, p1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    .line 157
+    :goto_109
     throw p0
 .end method
 
@@ -527,51 +868,53 @@
         }
     .end annotation
 
-    .line 175
+    .line 248
     invoke-virtual {p0}, Landroid/app/Activity;->getApplicationContext()Landroid/content/Context;
 
     move-result-object p0
 
-    .line 176
-    invoke-virtual {p0}, Landroid/content/Context;->getFilesDir()Ljava/io/File;
+    .line 249
+    new-instance v0, Ljava/io/File;
 
-    move-result-object v0
+    invoke-virtual {p0}, Landroid/content/Context;->getApplicationInfo()Landroid/content/pm/ApplicationInfo;
 
-    invoke-virtual {v0}, Ljava/io/File;->getParentFile()Ljava/io/File;
+    move-result-object v1
 
-    move-result-object v0
+    iget-object v1, v1, Landroid/content/pm/ApplicationInfo;->dataDir:Ljava/lang/String;
 
-    .line 177
-    new-instance v1, Ljava/io/File;
+    invoke-direct {v0, v1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+
+    .line 250
+    new-instance v0, Ljava/io/File;
 
     invoke-virtual {p0}, Landroid/content/Context;->getCacheDir()Ljava/io/File;
 
-    move-result-object v2
+    move-result-object v1
 
-    const-string v3, "launcher_restore_staging"
+    const-string v2, "launcher_restore_staging"
 
-    invoke-direct {v1, v2, v3}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+    invoke-direct {v0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 178
-    invoke-static {v1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
+    .line 251
+    invoke-static {v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
 
-    .line 179
-    invoke-virtual {v1}, Ljava/io/File;->mkdirs()Z
+    .line 252
+    invoke-virtual {v0}, Ljava/io/File;->mkdirs()Z
 
-    move-result v2
+    move-result v1
 
-    if-nez v2, :cond_2f
+    if-nez v1, :cond_32
 
-    invoke-virtual {v1}, Ljava/io/File;->isDirectory()Z
+    invoke-virtual {v0}, Ljava/io/File;->isDirectory()Z
 
-    move-result v2
+    move-result v1
 
-    if-eqz v2, :cond_27
+    if-eqz v1, :cond_2a
 
-    goto :goto_2f
+    goto :goto_32
 
-    .line 180
-    :cond_27
+    .line 253
+    :cond_2a
     new-instance p0, Ljava/io/IOException;
 
     const-string p1, "staging mkdir failed"
@@ -580,72 +923,72 @@
 
     throw p0
 
-    .line 183
-    :cond_2f
-    :goto_2f
+    .line 256
+    :cond_32
+    :goto_32
     invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
 
-    move-result-object p0
+    move-result-object v1
 
-    invoke-virtual {p0, p1}, Landroid/content/ContentResolver;->openInputStream(Landroid/net/Uri;)Ljava/io/InputStream;
+    invoke-virtual {v1, p1}, Landroid/content/ContentResolver;->openInputStream(Landroid/net/Uri;)Ljava/io/InputStream;
 
-    move-result-object p0
+    move-result-object p1
 
-    if-eqz p0, :cond_f4
+    if-eqz p1, :cond_10f
 
-    .line 185
-    new-instance p1, Ljava/util/zip/ZipInputStream;
+    .line 258
+    new-instance v1, Ljava/util/zip/ZipInputStream;
 
     new-instance v2, Ljava/io/BufferedInputStream;
 
     const/high16 v3, 0x10000
 
-    invoke-direct {v2, p0, v3}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
+    invoke-direct {v2, p1, v3}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
 
-    invoke-direct {p1, v2}, Ljava/util/zip/ZipInputStream;-><init>(Ljava/io/InputStream;)V
+    invoke-direct {v1, v2}, Ljava/util/zip/ZipInputStream;-><init>(Ljava/io/InputStream;)V
 
-    .line 186
-    new-array p0, v3, [B
+    .line 259
+    new-array p1, v3, [B
 
     const/4 v2, 0x0
 
     const/4 v4, 0x0
 
-    .line 189
-    :cond_49
-    :goto_49
-    :try_start_49
-    invoke-virtual {p1}, Ljava/util/zip/ZipInputStream;->getNextEntry()Ljava/util/zip/ZipEntry;
+    .line 262
+    :cond_4c
+    :goto_4c
+    :try_start_4c
+    invoke-virtual {v1}, Ljava/util/zip/ZipInputStream;->getNextEntry()Ljava/util/zip/ZipEntry;
 
     move-result-object v5
 
-    if-eqz v5, :cond_c5
+    if-eqz v5, :cond_c8
 
-    .line 190
+    .line 263
     invoke-virtual {v5}, Ljava/util/zip/ZipEntry;->isDirectory()Z
 
     move-result v6
 
-    if-eqz v6, :cond_56
+    if-eqz v6, :cond_59
 
-    goto :goto_49
+    goto :goto_4c
 
-    .line 191
-    :cond_56
+    .line 264
+    :cond_59
     invoke-virtual {v5}, Ljava/util/zip/ZipEntry;->getName()Ljava/lang/String;
 
     move-result-object v5
 
-    if-eqz v5, :cond_49
+    if-eqz v5, :cond_4c
 
-    .line 192
+    .line 265
     const-string v6, ".."
 
     invoke-virtual {v5, v6}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
 
     move-result v6
 
-    if-nez v6, :cond_49
+    if-nez v6, :cond_4c
 
     const-string v6, "/../"
 
@@ -653,19 +996,19 @@
 
     move-result v6
 
-    if-eqz v6, :cond_6d
+    if-eqz v6, :cond_70
 
-    goto :goto_49
+    goto :goto_4c
 
-    .line 193
-    :cond_6d
+    .line 266
+    :cond_70
     const-string v6, "shared_prefs/"
 
     invoke-virtual {v5, v6}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
 
     move-result v6
 
-    if-nez v6, :cond_7e
+    if-nez v6, :cond_81
 
     const-string v6, "databases/"
 
@@ -673,14 +1016,14 @@
 
     move-result v6
 
-    if-nez v6, :cond_7e
+    if-nez v6, :cond_81
 
-    goto :goto_49
+    goto :goto_4c
 
-    :cond_7e
+    :cond_81
     const/16 v6, 0x2f
 
-    .line 194
+    .line 267
     invoke-virtual {v5, v6}, Ljava/lang/String;->indexOf(I)I
 
     move-result v7
@@ -693,40 +1036,40 @@
 
     const/4 v7, -0x1
 
-    if-eq v6, v7, :cond_8e
+    if-eq v6, v7, :cond_91
 
-    goto :goto_49
+    goto :goto_4c
 
-    .line 195
-    :cond_8e
+    .line 268
+    :cond_91
     new-instance v6, Ljava/io/File;
 
-    invoke-direct {v6, v1, v5}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+    invoke-direct {v6, v0, v5}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
 
-    .line 196
+    .line 269
     invoke-virtual {v6}, Ljava/io/File;->getParentFile()Ljava/io/File;
 
     move-result-object v5
 
-    if-eqz v5, :cond_49
+    if-eqz v5, :cond_4c
 
-    .line 197
+    .line 270
     invoke-virtual {v5}, Ljava/io/File;->isDirectory()Z
 
     move-result v8
 
-    if-nez v8, :cond_a6
+    if-nez v8, :cond_a9
 
     invoke-virtual {v5}, Ljava/io/File;->mkdirs()Z
 
     move-result v5
 
-    if-nez v5, :cond_a6
+    if-nez v5, :cond_a9
 
-    goto :goto_49
+    goto :goto_4c
 
-    .line 198
-    :cond_a6
+    .line 271
+    :cond_a9
     new-instance v5, Ljava/io/BufferedOutputStream;
 
     new-instance v8, Ljava/io/FileOutputStream;
@@ -734,110 +1077,135 @@
     invoke-direct {v8, v6}, Ljava/io/FileOutputStream;-><init>(Ljava/io/File;)V
 
     invoke-direct {v5, v8, v3}, Ljava/io/BufferedOutputStream;-><init>(Ljava/io/OutputStream;I)V
-    :try_end_b0
-    .catchall {:try_start_49 .. :try_end_b0} :catchall_ef
+    :try_end_b3
+    .catchall {:try_start_4c .. :try_end_b3} :catchall_10a
 
-    .line 201
-    :goto_b0
-    :try_start_b0
-    invoke-virtual {p1, p0}, Ljava/util/zip/ZipInputStream;->read([B)I
+    .line 274
+    :goto_b3
+    :try_start_b3
+    invoke-virtual {v1, p1}, Ljava/util/zip/ZipInputStream;->read([B)I
 
     move-result v6
 
-    if-eq v6, v7, :cond_ba
+    if-eq v6, v7, :cond_bd
 
-    .line 202
-    invoke-virtual {v5, p0, v2, v6}, Ljava/io/OutputStream;->write([BII)V
-    :try_end_b9
-    .catchall {:try_start_b0 .. :try_end_b9} :catchall_c0
+    .line 275
+    invoke-virtual {v5, p1, v2, v6}, Ljava/io/OutputStream;->write([BII)V
+    :try_end_bc
+    .catchall {:try_start_b3 .. :try_end_bc} :catchall_c3
 
-    goto :goto_b0
+    goto :goto_b3
 
-    .line 205
-    :cond_ba
-    :try_start_ba
+    .line 278
+    :cond_bd
+    :try_start_bd
     invoke-virtual {v5}, Ljava/io/OutputStream;->close()V
 
     add-int/lit8 v4, v4, 0x1
 
-    goto :goto_49
+    goto :goto_4c
 
-    :catchall_c0
+    :catchall_c3
     move-exception p0
 
     invoke-virtual {v5}, Ljava/io/OutputStream;->close()V
 
-    .line 206
+    .line 279
     throw p0
-    :try_end_c5
-    .catchall {:try_start_ba .. :try_end_c5} :catchall_ef
-
-    .line 211
-    :cond_c5
-    :try_start_c5
-    invoke-virtual {p1}, Ljava/util/zip/ZipInputStream;->close()V
     :try_end_c8
-    .catch Ljava/io/IOException; {:try_start_c5 .. :try_end_c8} :catch_c9
+    .catchall {:try_start_bd .. :try_end_c8} :catchall_10a
 
-    goto :goto_ca
+    .line 284
+    :cond_c8
+    :try_start_c8
+    invoke-virtual {v1}, Ljava/util/zip/ZipInputStream;->close()V
+    :try_end_cb
+    .catch Ljava/io/IOException; {:try_start_c8 .. :try_end_cb} :catch_cc
 
-    :catch_c9
+    goto :goto_cd
+
+    :catch_cc
     nop
 
-    :goto_ca
-    if-eqz v4, :cond_e4
+    :goto_cd
+    if-eqz v4, :cond_ff
 
-    .line 219
-    new-instance p0, Ljava/io/File;
+    .line 292
+    new-instance p1, Ljava/lang/StringBuilder;
 
+    const-string v1, "staged "
+
+    invoke-direct {p1, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p1, v4}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object p1
+
+    const-string v1, " files, applying"
+
+    invoke-virtual {p1, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p1
+
+    invoke-virtual {p1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    const-string v1, "LauncherBackup"
+
+    invoke-static {v1, p1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    .line 293
     const-string p1, "shared_prefs"
 
-    invoke-direct {p0, v0, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+    invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->resolveDir(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
 
-    invoke-static {v1, p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->applyStaged(Ljava/io/File;Ljava/io/File;)V
+    move-result-object p1
 
-    .line 220
-    new-instance p0, Ljava/io/File;
+    invoke-static {v0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->applyStaged(Ljava/io/File;Ljava/io/File;)V
 
+    .line 294
     const-string p1, "databases"
 
-    invoke-direct {p0, v0, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+    invoke-static {p0, p1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->resolveDir(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
 
-    invoke-static {v1, p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->applyStaged(Ljava/io/File;Ljava/io/File;)V
+    move-result-object p0
 
-    .line 221
-    invoke-static {v1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
+    invoke-static {v0, p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->applyStaged(Ljava/io/File;Ljava/io/File;)V
+
+    .line 295
+    invoke-static {v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
 
     return v4
 
-    .line 216
-    :cond_e4
-    invoke-static {v1}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
+    .line 289
+    :cond_ff
+    invoke-static {v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->deleteRecursively(Ljava/io/File;)V
 
-    .line 217
+    .line 290
     new-instance p0, Ljava/io/IOException;
 
-    const-string p1, "invalid backup file"
+    const-string p1, "invalid backup file (0 entries)"
 
     invoke-direct {p0, p1}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
 
     throw p0
 
-    :catchall_ef
+    :catchall_10a
     move-exception p0
 
-    .line 211
-    :try_start_f0
-    invoke-virtual {p1}, Ljava/util/zip/ZipInputStream;->close()V
-    :try_end_f3
-    .catch Ljava/io/IOException; {:try_start_f0 .. :try_end_f3} :catch_f3
+    .line 284
+    :try_start_10b
+    invoke-virtual {v1}, Ljava/util/zip/ZipInputStream;->close()V
+    :try_end_10e
+    .catch Ljava/io/IOException; {:try_start_10b .. :try_end_10e} :catch_10e
 
-    .line 214
-    :catch_f3
+    .line 287
+    :catch_10e
     throw p0
 
-    .line 184
-    :cond_f4
+    .line 257
+    :cond_10f
     new-instance p0, Ljava/io/IOException;
 
     const-string p1, "openInputStream failed"
@@ -850,7 +1218,7 @@
 .method private static getString(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
     .registers 6
 
-    .line 303
+    .line 390
     :try_start_0
     invoke-virtual {p0}, Landroid/app/Activity;->getResources()Landroid/content/res/Resources;
 
@@ -868,7 +1236,7 @@
 
     if-eqz p1, :cond_15
 
-    .line 305
+    .line 392
     invoke-virtual {p0, p1}, Landroid/app/Activity;->getString(I)Ljava/lang/String;
 
     move-result-object p0
@@ -909,29 +1277,75 @@
 
     return v1
 
+    .line 104
     :cond_10
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    const-string v3, "handleActivityResult req="
+
+    invoke-direct {v1, v3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v1, p1}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object p1
+
+    const-string v1, " result="
+
+    invoke-virtual {p1, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p1
+
+    invoke-virtual {p1, p2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object p1
+
+    invoke-virtual {p1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    const-string v1, "LauncherBackup"
+
+    invoke-static {v1, p1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
     const/4 p1, -0x1
 
-    if-ne p2, p1, :cond_3a
+    if-ne p2, p1, :cond_6a
 
-    if-eqz p3, :cond_3a
+    if-eqz p3, :cond_6a
 
-    .line 95
+    .line 105
     invoke-virtual {p3}, Landroid/content/Intent;->getData()Landroid/net/Uri;
 
     move-result-object p1
 
-    if-nez p1, :cond_1c
+    if-nez p1, :cond_3a
 
-    goto :goto_3a
+    goto :goto_6a
 
-    .line 98
-    :cond_1c
+    .line 108
+    :cond_3a
     invoke-virtual {p3}, Landroid/content/Intent;->getData()Landroid/net/Uri;
 
     move-result-object p1
 
-    .line 99
+    .line 109
+    new-instance p2, Ljava/lang/StringBuilder;
+
+    const-string p3, "uri="
+
+    invoke-direct {p2, p3}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p2, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p2
+
+    invoke-virtual {p2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p2
+
+    invoke-static {v1, p2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    .line 110
     const-string p2, "backup_restore_working"
 
     const-string p3, "\u6b63\u5728\u5904\u7406\u2026"
@@ -942,7 +1356,7 @@
 
     invoke-static {p0, p2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->toast(Landroid/app/Activity;Ljava/lang/String;)V
 
-    .line 100
+    .line 111
     new-instance p2, Ljava/lang/Thread;
 
     new-instance p3, Lcom/smartisanos/home/settings/LauncherBackupRestore$2;
@@ -953,18 +1367,18 @@
 
     invoke-direct {p2, p3, p0}, Ljava/lang/Thread;-><init>(Ljava/lang/Runnable;Ljava/lang/String;)V
 
-    .line 116
+    .line 133
     invoke-virtual {p2}, Ljava/lang/Thread;->start()V
 
-    :cond_3a
-    :goto_3a
+    :cond_6a
+    :goto_6a
     return v2
 .end method
 
 .method private static postToast(Landroid/app/Activity;Ljava/lang/String;)V
     .registers 3
 
-    .line 321
+    .line 408
     :try_start_0
     invoke-virtual {p0}, Landroid/app/Activity;->isFinishing()Z
 
@@ -972,7 +1386,7 @@
 
     if-eqz v0, :cond_13
 
-    .line 322
+    .line 409
     invoke-virtual {p0}, Landroid/app/Activity;->getApplicationContext()Landroid/content/Context;
 
     move-result-object p0
@@ -987,7 +1401,7 @@
 
     return-void
 
-    .line 325
+    .line 412
     :cond_13
     new-instance v0, Lcom/smartisanos/home/settings/LauncherBackupRestore$4;
 
@@ -1001,10 +1415,143 @@
     return-void
 .end method
 
+.method private static resolveDir(Landroid/content/Context;Ljava/lang/String;)Ljava/io/File;
+    .registers 5
+
+    .line 199
+    new-instance v0, Ljava/io/File;
+
+    invoke-virtual {p0}, Landroid/content/Context;->getApplicationInfo()Landroid/content/pm/ApplicationInfo;
+
+    move-result-object v1
+
+    iget-object v1, v1, Landroid/content/pm/ApplicationInfo;->dataDir:Ljava/lang/String;
+
+    invoke-direct {v0, v1, p1}, Ljava/io/File;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+
+    .line 200
+    invoke-virtual {v0}, Ljava/io/File;->isDirectory()Z
+
+    move-result v1
+
+    if-eqz v1, :cond_12
+
+    return-object v0
+
+    .line 201
+    :cond_12
+    invoke-virtual {p0}, Landroid/content/Context;->getFilesDir()Ljava/io/File;
+
+    move-result-object v1
+
+    invoke-virtual {v1}, Ljava/io/File;->getParentFile()Ljava/io/File;
+
+    move-result-object v1
+
+    if-eqz v1, :cond_22
+
+    .line 202
+    new-instance v2, Ljava/io/File;
+
+    invoke-direct {v2, v1, p1}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+
+    goto :goto_23
+
+    :cond_22
+    const/4 v2, 0x0
+
+    :goto_23
+    if-eqz v2, :cond_2c
+
+    .line 203
+    invoke-virtual {v2}, Ljava/io/File;->isDirectory()Z
+
+    move-result v1
+
+    if-eqz v1, :cond_2c
+
+    return-object v2
+
+    .line 204
+    :cond_2c
+    const-string v1, "databases"
+
+    invoke-virtual {v1, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v1
+
+    if-eqz v1, :cond_47
+
+    .line 205
+    const-string v1, "probe.db"
+
+    invoke-virtual {p0, v1}, Landroid/content/Context;->getDatabasePath(Ljava/lang/String;)Ljava/io/File;
+
+    move-result-object p0
+
+    .line 206
+    invoke-virtual {p0}, Ljava/io/File;->getParentFile()Ljava/io/File;
+
+    move-result-object p0
+
+    if-eqz p0, :cond_47
+
+    .line 207
+    invoke-virtual {p0}, Ljava/io/File;->isDirectory()Z
+
+    move-result v1
+
+    if-eqz v1, :cond_47
+
+    return-object p0
+
+    .line 209
+    :cond_47
+    new-instance p0, Ljava/lang/StringBuilder;
+
+    const-string v1, "resolveDir: \'"
+
+    invoke-direct {p0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    const-string p1, "\' not found. tried: "
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    const-string p1, ", "
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    const-string p1, "LauncherBackup"
+
+    invoke-static {p1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+
+    return-object v0
+.end method
+
 .method private static scheduleRestart(Landroid/app/Activity;)V
     .registers 5
 
-    .line 270
+    .line 348
     new-instance v0, Landroid/os/Handler;
 
     invoke-static {}, Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
@@ -1013,7 +1560,7 @@
 
     invoke-direct {v0, v1}, Landroid/os/Handler;-><init>(Landroid/os/Looper;)V
 
-    .line 271
+    .line 349
     new-instance v1, Lcom/smartisanos/home/settings/LauncherBackupRestore$3;
 
     invoke-direct {v1, p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore$3;-><init>(Landroid/app/Activity;)V
@@ -1026,80 +1573,96 @@
 .end method
 
 .method public static startBackup(Landroid/app/Activity;)V
-    .registers 6
-
-    const-string v0, "smartisan-launcher-backup-"
-
-    .line 47
-    :try_start_2
-    new-instance v1, Landroid/content/Intent;
-
-    const-string v2, "android.intent.action.CREATE_DOCUMENT"
-
-    invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
-
-    .line 48
-    const-string v2, "android.intent.category.OPENABLE"
-
-    invoke-virtual {v1, v2}, Landroid/content/Intent;->addCategory(Ljava/lang/String;)Landroid/content/Intent;
-
-    .line 49
-    const-string v2, "application/zip"
-
-    invoke-virtual {v1, v2}, Landroid/content/Intent;->setType(Ljava/lang/String;)Landroid/content/Intent;
-
-    .line 50
-    new-instance v2, Ljava/text/SimpleDateFormat;
-
-    const-string v3, "yyyyMMdd-HHmmss"
-
-    sget-object v4, Ljava/util/Locale;->US:Ljava/util/Locale;
-
-    invoke-direct {v2, v3, v4}, Ljava/text/SimpleDateFormat;-><init>(Ljava/lang/String;Ljava/util/Locale;)V
-
-    new-instance v3, Ljava/util/Date;
-
-    invoke-direct {v3}, Ljava/util/Date;-><init>()V
-
-    invoke-virtual {v2, v3}, Ljava/text/SimpleDateFormat;->format(Ljava/util/Date;)Ljava/lang/String;
-
-    move-result-object v2
-
-    .line 51
-    const-string v3, "android.intent.extra.TITLE"
-
-    new-instance v4, Ljava/lang/StringBuilder;
-
-    invoke-direct {v4, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-
-    invoke-virtual {v4, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    const-string v2, ".zip"
-
-    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v0
-
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v0
-
-    invoke-virtual {v1, v3, v0}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
-
-    const/16 v0, 0x13f7
+    .registers 7
 
     .line 52
-    invoke-virtual {p0, v1, v0}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
-    :try_end_42
-    .catch Landroid/content/ActivityNotFoundException; {:try_start_2 .. :try_end_42} :catch_4f
-    .catchall {:try_start_2 .. :try_end_42} :catchall_43
+    const-string v0, "LauncherBackup"
 
-    goto :goto_54
+    .line 0
+    const-string v1, "smartisan-launcher-backup-"
+
+    .line 52
+    :try_start_4
+    const-string v2, "startBackup"
+
+    invoke-static {v0, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    .line 53
+    new-instance v2, Landroid/content/Intent;
+
+    const-string v3, "android.intent.action.CREATE_DOCUMENT"
+
+    invoke-direct {v2, v3}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    .line 54
+    const-string v3, "android.intent.category.OPENABLE"
+
+    invoke-virtual {v2, v3}, Landroid/content/Intent;->addCategory(Ljava/lang/String;)Landroid/content/Intent;
+
+    .line 55
+    const-string v3, "application/zip"
+
+    invoke-virtual {v2, v3}, Landroid/content/Intent;->setType(Ljava/lang/String;)Landroid/content/Intent;
 
     .line 56
-    :catchall_43
+    new-instance v3, Ljava/text/SimpleDateFormat;
+
+    const-string v4, "yyyyMMdd-HHmmss"
+
+    sget-object v5, Ljava/util/Locale;->US:Ljava/util/Locale;
+
+    invoke-direct {v3, v4, v5}, Ljava/text/SimpleDateFormat;-><init>(Ljava/lang/String;Ljava/util/Locale;)V
+
+    new-instance v4, Ljava/util/Date;
+
+    invoke-direct {v4}, Ljava/util/Date;-><init>()V
+
+    invoke-virtual {v3, v4}, Ljava/text/SimpleDateFormat;->format(Ljava/util/Date;)Ljava/lang/String;
+
+    move-result-object v3
+
+    .line 57
+    const-string v4, "android.intent.extra.TITLE"
+
+    new-instance v5, Ljava/lang/StringBuilder;
+
+    invoke-direct {v5, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v5, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    const-string v3, ".zip"
+
+    invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v1
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-virtual {v2, v4, v1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    const/16 v1, 0x13f7
+
+    .line 58
+    invoke-virtual {p0, v2, v1}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
+    :try_end_49
+    .catch Landroid/content/ActivityNotFoundException; {:try_start_4 .. :try_end_49} :catch_5c
+    .catchall {:try_start_4 .. :try_end_49} :catchall_4a
+
+    goto :goto_61
+
+    :catchall_4a
+    move-exception v1
+
+    .line 62
+    const-string v2, "startBackup failed"
+
+    invoke-static {v0, v2, v1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    .line 63
     const-string v0, "backup_restore_failed"
 
     const-string v1, "\u64cd\u4f5c\u5931\u8d25"
@@ -1110,22 +1673,22 @@
 
     invoke-static {p0, v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->toast(Landroid/app/Activity;Ljava/lang/String;)V
 
-    goto :goto_54
+    goto :goto_61
 
-    .line 54
-    :catch_4f
+    .line 60
+    :catch_5c
     const-string v0, "\u672a\u627e\u5230\u7cfb\u7edf\u6587\u4ef6\u9009\u62e9\u5668"
 
     invoke-static {p0, v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->toast(Landroid/app/Activity;Ljava/lang/String;)V
 
-    :goto_54
+    :goto_61
     return-void
 .end method
 
 .method public static startRestore(Landroid/app/Activity;)V
     .registers 4
 
-    .line 62
+    .line 69
     :try_start_0
     new-instance v0, Landroid/app/AlertDialog$Builder;
 
@@ -1135,7 +1698,7 @@
 
     const-string v2, "\u8fd8\u539f\u684c\u9762\u6570\u636e"
 
-    .line 63
+    .line 70
     invoke-static {p0, v1, v2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->getString(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v1
@@ -1148,7 +1711,7 @@
 
     const-string v2, "\u5c06\u7528\u5907\u4efd\u6587\u4ef6\u8986\u76d6\u5f53\u524d\u6240\u6709\u8bbe\u7f6e\u548c\u684c\u9762\u5e03\u5c40\uff0c\u5b8c\u6210\u540e\u684c\u9762\u4f1a\u81ea\u52a8\u91cd\u542f\u3002\u786e\u5b9a\u7ee7\u7eed\uff1f"
 
-    .line 64
+    .line 71
     invoke-static {p0, v1, v2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->getString(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v1
@@ -1163,7 +1726,7 @@
 
     const v2, 0x104000a
 
-    .line 66
+    .line 73
     invoke-virtual {v0, v2, v1}, Landroid/app/AlertDialog$Builder;->setPositiveButton(ILandroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v0
@@ -1172,20 +1735,29 @@
 
     const/4 v2, 0x0
 
-    .line 79
+    .line 87
     invoke-virtual {v0, v1, v2}, Landroid/app/AlertDialog$Builder;->setNegativeButton(ILandroid/content/DialogInterface$OnClickListener;)Landroid/app/AlertDialog$Builder;
 
     move-result-object v0
 
-    .line 80
+    .line 88
     invoke-virtual {v0}, Landroid/app/AlertDialog$Builder;->show()Landroid/app/AlertDialog;
     :try_end_33
     .catchall {:try_start_0 .. :try_end_33} :catchall_34
 
-    goto :goto_3f
+    goto :goto_47
 
-    .line 82
     :catchall_34
+    move-exception v0
+
+    .line 90
+    const-string v1, "LauncherBackup"
+
+    const-string v2, "startRestore dialog failed"
+
+    invoke-static {v1, v2, v0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    .line 91
     const-string v0, "backup_restore_failed"
 
     const-string v1, "\u64cd\u4f5c\u5931\u8d25"
@@ -1196,7 +1768,7 @@
 
     invoke-static {p0, v0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->toast(Landroid/app/Activity;Ljava/lang/String;)V
 
-    :goto_3f
+    :goto_47
     return-void
 .end method
 
@@ -1205,7 +1777,7 @@
 
     const/4 v0, 0x0
 
-    .line 314
+    .line 401
     :try_start_1
     invoke-static {p0, p1, v0}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
 
@@ -1227,47 +1799,66 @@
         }
     .end annotation
 
-    .line 144
+    .line 214
     invoke-virtual {p1}, Ljava/io/File;->listFiles()[Ljava/io/File;
 
-    move-result-object p1
+    move-result-object v0
 
-    const/4 v0, 0x0
+    const/4 v1, 0x0
 
-    if-nez p1, :cond_8
+    if-nez v0, :cond_1c
 
-    return v0
+    .line 216
+    new-instance p0, Ljava/lang/StringBuilder;
 
-    :cond_8
-    const/high16 v1, 0x10000
+    const-string p2, "zipDir: listFiles null for "
 
-    .line 147
-    new-array v2, v1, [B
+    invoke-direct {p0, p2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    move-result-object p0
+
+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p0
+
+    const-string p1, "LauncherBackup"
+
+    invoke-static {p1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+
+    return v1
+
+    :cond_1c
+    const/high16 p1, 0x10000
+
+    .line 220
+    new-array v2, p1, [B
 
     const/4 v3, 0x0
 
     const/4 v4, 0x0
 
-    .line 148
-    :goto_e
-    array-length v5, p1
+    .line 221
+    :goto_22
+    array-length v5, v0
 
-    if-ge v3, v5, :cond_69
+    if-ge v3, v5, :cond_7d
 
-    .line 149
-    aget-object v5, p1, v3
+    .line 222
+    aget-object v5, v0, v3
 
-    .line 150
+    .line 223
     invoke-virtual {v5}, Ljava/io/File;->isDirectory()Z
 
     move-result v6
 
-    if-eqz v6, :cond_1a
+    if-eqz v6, :cond_2e
 
-    goto :goto_61
+    goto :goto_75
 
-    .line 151
-    :cond_1a
+    .line 224
+    :cond_2e
     new-instance v6, Ljava/util/zip/ZipEntry;
 
     new-instance v7, Ljava/lang/StringBuilder;
@@ -1298,66 +1889,66 @@
 
     invoke-direct {v6, v7}, Ljava/util/zip/ZipEntry;-><init>(Ljava/lang/String;)V
 
-    .line 152
+    .line 225
     invoke-virtual {v5}, Ljava/io/File;->lastModified()J
 
     move-result-wide v7
 
     invoke-virtual {v6, v7, v8}, Ljava/util/zip/ZipEntry;->setTime(J)V
 
-    .line 153
+    .line 226
     invoke-virtual {p0, v6}, Ljava/util/zip/ZipOutputStream;->putNextEntry(Ljava/util/zip/ZipEntry;)V
 
-    .line 154
+    .line 227
     new-instance v6, Ljava/io/BufferedInputStream;
 
     new-instance v7, Ljava/io/FileInputStream;
 
     invoke-direct {v7, v5}, Ljava/io/FileInputStream;-><init>(Ljava/io/File;)V
 
-    invoke-direct {v6, v7, v1}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
+    invoke-direct {v6, v7, p1}, Ljava/io/BufferedInputStream;-><init>(Ljava/io/InputStream;I)V
 
-    .line 157
-    :goto_4e
-    :try_start_4e
+    .line 230
+    :goto_62
+    :try_start_62
     invoke-virtual {v6, v2}, Ljava/io/InputStream;->read([B)I
 
     move-result v5
 
     const/4 v7, -0x1
 
-    if-eq v5, v7, :cond_59
+    if-eq v5, v7, :cond_6d
 
-    .line 158
-    invoke-virtual {p0, v2, v0, v5}, Ljava/util/zip/ZipOutputStream;->write([BII)V
-    :try_end_58
-    .catchall {:try_start_4e .. :try_end_58} :catchall_64
+    .line 231
+    invoke-virtual {p0, v2, v1, v5}, Ljava/util/zip/ZipOutputStream;->write([BII)V
+    :try_end_6c
+    .catchall {:try_start_62 .. :try_end_6c} :catchall_78
 
-    goto :goto_4e
+    goto :goto_62
 
-    .line 161
-    :cond_59
+    .line 234
+    :cond_6d
     invoke-virtual {v6}, Ljava/io/InputStream;->close()V
 
-    .line 163
+    .line 236
     invoke-virtual {p0}, Ljava/util/zip/ZipOutputStream;->closeEntry()V
 
     add-int/lit8 v4, v4, 0x1
 
-    :goto_61
+    :goto_75
     add-int/lit8 v3, v3, 0x1
 
-    goto :goto_e
+    goto :goto_22
 
-    :catchall_64
+    :catchall_78
     move-exception p0
 
-    .line 161
+    .line 234
     invoke-virtual {v6}, Ljava/io/InputStream;->close()V
 
-    .line 162
+    .line 235
     throw p0
 
-    :cond_69
+    :cond_7d
     return v4
 .end method

@@ -30,7 +30,7 @@
         }
     .end annotation
 
-    .line 66
+    .line 73
     iput-object p1, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$1;->val$activity:Landroid/app/Activity;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -43,7 +43,7 @@
 .method public onClick(Landroid/content/DialogInterface;I)V
     .registers 4
 
-    .line 70
+    .line 77
     :try_start_0
     new-instance p1, Landroid/content/Intent;
 
@@ -51,17 +51,17 @@
 
     invoke-direct {p1, p2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
 
-    .line 71
+    .line 78
     const-string p2, "android.intent.category.OPENABLE"
 
     invoke-virtual {p1, p2}, Landroid/content/Intent;->addCategory(Ljava/lang/String;)Landroid/content/Intent;
 
-    .line 72
+    .line 79
     const-string p2, "application/zip"
 
     invoke-virtual {p1, p2}, Landroid/content/Intent;->setType(Ljava/lang/String;)Landroid/content/Intent;
 
-    .line 73
+    .line 80
     iget-object p2, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$1;->val$activity:Landroid/app/Activity;
 
     const/16 v0, 0x13f8
@@ -70,10 +70,19 @@
     :try_end_18
     .catchall {:try_start_0 .. :try_end_18} :catchall_19
 
-    goto :goto_26
+    goto :goto_2e
 
-    .line 75
     :catchall_19
+    move-exception p1
+
+    .line 82
+    const-string p2, "LauncherBackup"
+
+    const-string v0, "startRestore picker failed"
+
+    invoke-static {p2, v0, p1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+
+    .line 83
     iget-object p1, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$1;->val$activity:Landroid/app/Activity;
 
     const-string p2, "backup_restore_failed"
@@ -86,6 +95,6 @@
 
     invoke-static {p1, p2}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->access$100(Landroid/app/Activity;Ljava/lang/String;)V
 
-    :goto_26
+    :goto_2e
     return-void
 .end method

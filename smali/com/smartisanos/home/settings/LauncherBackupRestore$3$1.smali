@@ -25,7 +25,7 @@
 .method constructor <init>(Lcom/smartisanos/home/settings/LauncherBackupRestore$3;)V
     .registers 2
 
-    .line 278
+    .line 356
     iput-object p1, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$3$1;->this$0:Lcom/smartisanos/home/settings/LauncherBackupRestore$3;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -38,7 +38,7 @@
 .method public run()V
     .registers 2
 
-    .line 281
+    .line 359
     invoke-static {}, Landroid/os/Process;->myPid()I
 
     move-result v0

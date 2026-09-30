@@ -30,7 +30,7 @@
         }
     .end annotation
 
-    .line 271
+    .line 349
     iput-object p1, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$3;->val$activity:Landroid/app/Activity;
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -43,7 +43,7 @@
 .method public run()V
     .registers 5
 
-    .line 275
+    .line 353
     :try_start_0
     iget-object v0, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$3;->val$activity:Landroid/app/Activity;
 
@@ -51,7 +51,7 @@
     :try_end_5
     .catchall {:try_start_0 .. :try_end_5} :catchall_5
 
-    .line 278
+    .line 356
     :catchall_5
     new-instance v0, Landroid/os/Handler;
 

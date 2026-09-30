@@ -5274,6 +5274,15 @@
     .line 180
     invoke-super {p0, p1, p2, p3}, Lcom/smartisanos/home/settings/BaseActivity;->onActivityResult(IILandroid/content/Intent;)V
 
+    invoke-static {p0, p1, p2, p3}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->handleActivityResult(Landroid/app/Activity;IILandroid/content/Intent;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_br_backup_not_consumed
+
+    return-void
+
+    :cond_br_backup_not_consumed
     .line 181
     const/4 v0, 0x2
 

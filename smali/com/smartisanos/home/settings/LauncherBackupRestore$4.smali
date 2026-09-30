@@ -32,7 +32,7 @@
         }
     .end annotation
 
-    .line 325
+    .line 412
     iput-object p1, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$4;->val$activity:Landroid/app/Activity;
 
     iput-object p2, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$4;->val$msg:Ljava/lang/String;
@@ -47,7 +47,7 @@
 .method public run()V
     .registers 4
 
-    .line 329
+    .line 416
     :try_start_0
     iget-object v0, p0, Lcom/smartisanos/home/settings/LauncherBackupRestore$4;->val$activity:Landroid/app/Activity;
 
