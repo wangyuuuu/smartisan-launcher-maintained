@@ -1133,3 +1133,19 @@
 
     return-void
 .end method
+
+# 备份/还原入口已挪到本页，SAF 文件选择器的回调结果必须在这里认领，
+# 否则 requestCode 5111/5112 无人处理（表现为备份出空文件、还原无反应）
+.method protected onActivityResult(IILandroid/content/Intent;)V
+    .locals 0
+    .param p1, "requestCode"    # I
+    .param p2, "resultCode"    # I
+    .param p3, "data"    # Landroid/content/Intent;
+
+    .prologue
+    invoke-super {p0, p1, p2, p3}, Lcom/smartisanos/home/settings/BaseActivity;->onActivityResult(IILandroid/content/Intent;)V
+
+    invoke-static {p0, p1, p2, p3}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->handleActivityResult(Landroid/app/Activity;IILandroid/content/Intent;)Z
+
+    return-void
+.end method

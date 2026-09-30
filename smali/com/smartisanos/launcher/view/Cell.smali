@@ -3915,13 +3915,9 @@
     .local v16, "width":F
     sget v17, Lcom/smartisanos/launcher/data/Constants;->SINGLE_PAGE_MODE:I
 
-    invoke-static/range {v17 .. v17}, Lcom/smartisanos/launcher/data/Constants;->mode(I)Lcom/smartisanos/launcher/data/LayoutProperty;
+    invoke-static/range {v16 .. v16}, Lcom/smartisanos/launcher/view/Cell;->badgeAspectHeight(F)F
 
-    move-result-object v17
-
-    move-object/from16 v0, v17
-
-    iget v11, v0, Lcom/smartisanos/launcher/data/LayoutProperty;->cell_height:F
+    move-result v11
 
     .line 5357
     .local v11, "height":F
@@ -32633,11 +32629,9 @@
 
     iget v13, v13, Lcom/smartisanos/launcher/data/LayoutProperty;->cell_width:F
 
-    move-object/from16 v0, p0
+    invoke-static {v13}, Lcom/smartisanos/launcher/view/Cell;->badgeAspectHeight(F)F
 
-    iget-object v14, v0, Lcom/smartisanos/launcher/view/Cell;->mLayoutProp:Lcom/smartisanos/launcher/data/LayoutProperty;
-
-    iget v14, v14, Lcom/smartisanos/launcher/data/LayoutProperty;->cell_height:F
+    move-result v14
 
     move-object/from16 v0, p0
 
@@ -37867,4 +37861,32 @@
     const-string v1, "null"
 
     goto :goto_8
+.end method
+
+# 选中角标（brick_selected.png）是整张纹理铺满一个矩形：纹理画布宽高比固定
+# （9 宫格纹理 171x219、16 宫格纹理 129x176），而运行时 cell 宽高比由 initCellSize
+# 按屏幕比例算出（1080x2400 上约 0.56），直接拿 cell_height 当高会把红色圆底压扁。
+# 这里按纹理画布比例反推高度，保证角标圆底+白勾不被拉伸（只改高度，宽度不变）。
+.method private static badgeAspectHeight(F)F
+    .locals 3
+    .param p0, "width"    # F
+
+    .prologue
+    sget v0, Lcom/smartisanos/launcher/data/Constants;->SINGLE_PAGE_MODE:I
+
+    const/4 v1, 0x1
+
+    if-ne v0, v1, :cond_badge_ratio_16
+
+    const v0, 0x3FA3EE09    # 1.2807f = 219/171，Textures/1080p/9/brick_selected.png 画布比
+
+    goto :goto_badge_ratio
+
+    :cond_badge_ratio_16
+    const v0, 0x3FAEA2BB    # 1.3643f = 176/129，Textures/1080p/16/brick_selected.png 画布比
+
+    :goto_badge_ratio
+    mul-float v0, p0, v0
+
+    return v0
 .end method
