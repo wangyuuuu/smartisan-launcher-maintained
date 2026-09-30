@@ -2220,7 +2220,7 @@
 
 # virtual methods
 .method public addMovement(Lcom/smartisanos/smengine/TMotionEvent;)V
-    .locals 10
+    .locals 12
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
@@ -2401,6 +2401,26 @@
 
     aput v3, v4, v2
 
+    # 【维护版】按"指腹接触面积"置位 mMightSweep —— 它是单指横扫 canSweep() 的前置条件
+    # （mightSweep() -> TouchSizeRecoder.mightSweep() -> 本字段）。原版只把 size 存进
+    # TouchSizeRecoder 却从不置本字段，导致 canSweep() 恒为 false，单指横扫彻底失效，
+    # 只剩 canSweepII()（双指上滑 >250px）一条路。阈值沿用 Constants.sweep_threshold/100f。
+    sget v10, Lcom/smartisanos/launcher/data/Constants;->sweep_threshold:I
+
+    int-to-float v10, v10
+
+    const/high16 v11, 0x42c80000    # 100.0f
+
+    div-float/2addr v10, v11
+
+    cmpl-float v11, v3, v10
+
+    if-lez v11, :cond_sweep_size_small
+
+    iput-boolean v9, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
+    :cond_sweep_size_small
+
     .line 91
     sget v4, Lcom/smartisanos/launcher/data/Constants;->sPageMode:I
 
@@ -2436,6 +2456,41 @@
 
     invoke-static {v4, v6, v7, v5, v3}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;->access$900(Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;JFF)V
 
+    # 【维护版·临时诊断】只在单页模式的按下/抬起时打印，用于标定真机的 contact size。
+    new-instance v10, Ljava/lang/StringBuilder;
+
+    invoke-direct {v10}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v11, "size="
+
+    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v10
+
+    invoke-virtual {v10, v3}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
+
+    move-result-object v10
+
+    const-string v11, " might="
+
+    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v10
+
+    iget-boolean v11, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
+
+    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
+
+    move-result-object v10
+
+    invoke-virtual {v10}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v10
+
+    const-string v11, "SweepDbg"
+
+    invoke-static {v11, v10}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+
     .line 84
     :cond_6
     add-int/lit8 v0, v0, 0x1
@@ -2460,7 +2515,7 @@
 .end method
 
 .method public canSweep(Lcom/smartisanos/smengine/TMotionEvent;)Z
-    .locals 6
+    .locals 8
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
@@ -2500,7 +2555,7 @@
 
     cmpg-float v2, v0, v2
 
-    if-gez v2, :cond_1
+    if-gez v2, :cond_md_fail
 
     .line 191
     invoke-static {}, Lcom/smartisanos/home/Launcher;->getInstance()Lcom/smartisanos/home/Launcher;
@@ -2524,7 +2579,7 @@
 
     aget v2, v2, v1
 
-    if-nez v2, :cond_1
+    if-nez v2, :cond_decor_fail
 
     .line 193
     sget-boolean v2, Lcom/smartisanos/launcher/LOG;->ENABLE_DEBUG:Z
@@ -2541,10 +2596,61 @@
     invoke-virtual {v2, v3, v4}, Lcom/smartisanos/launcher/LOG;->error(Ljava/lang/String;Ljava/lang/String;)V
 
     .line 200
-    .end local v0    # "moveDistance":F
     :cond_0
     :goto_0
     return v1
+
+    # 【维护版·临时诊断】以下两个分支 = "接触面积够大（可能横扫）但最终被否决"，
+    # 打印否决原因，便于按真机数据标定；确认无需再调后可整段删除。
+    :cond_decor_fail
+    new-instance v6, Ljava/lang/StringBuilder;
+
+    invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v7, "decorY="
+
+    invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v6
+
+    invoke-virtual {v6, v2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object v6
+
+    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v6
+
+    const-string v7, "SweepDbg"
+
+    invoke-static {v7, v6}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+
+    goto :cond_1
+
+    :cond_md_fail
+    new-instance v6, Ljava/lang/StringBuilder;
+
+    invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v7, "md="
+
+    invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v6
+
+    invoke-virtual {v6, v0}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
+
+    move-result-object v6
+
+    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v6
+
+    const-string v7, "SweepDbg"
+
+    invoke-static {v7, v6}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
+
+    goto :cond_1
 
     :cond_1
     const/4 v1, 0x0
@@ -2988,13 +3094,20 @@
 .end method
 
 .method public sweep()V
-    .locals 1
+    .locals 3
 
     .prologue
     .line 204
     iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mTouchSizeRecoder:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;
 
     invoke-static {v0}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;->access$1100(Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;)V
+
+    # 【维护版·临时诊断】扫描判定通过，准备回调 onSweep
+    const-string v1, "SweepDbg"
+
+    const-string v2, "canSweep=true -> sweep()"
+
+    invoke-static {v1, v2}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
 
     .line 205
     iget-object v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mGestureListener:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$GestureListener;
