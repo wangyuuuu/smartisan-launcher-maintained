@@ -2401,25 +2401,12 @@
 
     aput v3, v4, v2
 
-    # 【维护版】按"指腹接触面积"置位 mMightSweep —— 它是单指横扫 canSweep() 的前置条件
-    # （mightSweep() -> TouchSizeRecoder.mightSweep() -> 本字段）。原版只把 size 存进
-    # TouchSizeRecoder 却从不置本字段，导致 canSweep() 恒为 false，单指横扫彻底失效，
-    # 只剩 canSweepII()（双指上滑 >250px）一条路。阈值沿用 Constants.sweep_threshold/100f。
-    sget v10, Lcom/smartisanos/launcher/data/Constants;->sweep_threshold:I
-
-    int-to-float v10, v10
-
-    const/high16 v11, 0x42c80000    # 100.0f
-
-    div-float/2addr v10, v11
-
-    cmpl-float v11, v3, v10
-
-    if-lez v11, :cond_sweep_size_small
-
-    iput-boolean v9, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
-
-    :cond_sweep_size_small
+    # 【维护版】此处曾尝试用"接触面积 > Constants.sweep_threshold/100f"置位 mMightSweep，
+    # 以点亮单指横扫 canSweep()。实测（魅族 20 Pro，2026-09-30）该机普通指尖点按上报
+    # size 就有 0.26~0.50，0.08 的门槛等于把每一次点按都判成横扫，而横扫成功会走
+    # DragLayer$1.onSweep() -> MainView.requestLockTouch(true, 280ms) 锁触摸，结果
+    # 整个桌面点不动也划不动。故暂时不置位（保持原版"永不触发"），只保留下面的实测日志，
+    # 待用真机数据（平贴按压 vs 指尖点按的 size 分布）标定出合适门槛后再打开。
 
     .line 91
     sget v4, Lcom/smartisanos/launcher/data/Constants;->sPageMode:I
@@ -2457,11 +2444,27 @@
     invoke-static {v4, v6, v7, v5, v3}, Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;->access$900(Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;JFF)V
 
     # 【维护版·临时诊断】只在单页模式的按下/抬起时打印，用于标定真机的 contact size。
+    # 标定方法：普通指尖点按几次（读 size 分布）→ 指腹平贴屏幕按压/横扫几次（读 size 分布），
+    # 取二者之间取门槛。act=0 按下 / act=1 抬起。
+    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getAction()I
+
+    move-result v4
+
     new-instance v10, Ljava/lang/StringBuilder;
 
     invoke-direct {v10}, Ljava/lang/StringBuilder;-><init>()V
 
-    const-string v11, "size="
+    const-string v11, "act="
+
+    invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    move-result-object v10
+
+    invoke-virtual {v10, v4}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+
+    move-result-object v10
+
+    const-string v11, " size="
 
     invoke-virtual {v10, v11}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
 
