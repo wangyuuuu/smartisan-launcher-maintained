@@ -696,4 +696,13 @@
     <string name="theme_name">theme_name</string>
     <string name="twitter">Twitter</string>
     <string name="shortcut_removed_success">Shortcut removed</string>
+    <string name="backup_restore_item_backup">Back up launcher data</string>
+    <string name="backup_restore_item_restore">Restore launcher data</string>
+    <string name="backup_restore_restore_title">Restore backup</string>
+    <string name="backup_restore_restore_confirm">This will overwrite ALL current settings and desktop layout with the backup file. The launcher will restart automatically. Continue?</string>
+    <string name="backup_restore_working">Processing…</string>
+    <string name="backup_restore_backup_done">Backup saved</string>
+    <string name="backup_restore_restore_done">Restored. Restarting launcher…</string>
+    <string name="backup_restore_failed">Operation failed</string>
+    <string name="backup_restore_bad_file">Invalid backup file</string>
 </resources>

@@ -553,4 +553,13 @@
     <string name="weather_toast">当前 %1$s ℃，%2$s</string>
     <string name="weather_toast_no_data">当前无法获取天气数据</string>
     <string name="shortcut_removed_success">快捷方式已删除</string>
+    <string name="backup_restore_item_backup">备份桌面数据</string>
+    <string name="backup_restore_item_restore">还原桌面数据</string>
+    <string name="backup_restore_restore_title">还原桌面数据</string>
+    <string name="backup_restore_restore_confirm">将用备份文件覆盖当前所有设置和桌面布局，完成后桌面会自动重启。确定继续？</string>
+    <string name="backup_restore_working">正在处理…</string>
+    <string name="backup_restore_backup_done">备份完成</string>
+    <string name="backup_restore_restore_done">还原完成，正在重启桌面…</string>
+    <string name="backup_restore_failed">操作失败</string>
+    <string name="backup_restore_bad_file">无效的备份文件</string>
 </resources>

@@ -5302,6 +5302,26 @@
     return-void
 .end method
 
+.method public openBackupSettings(Landroid/view/View;)V
+    .locals 1
+    .param p1, "v"    # Landroid/view/View;
+
+    .prologue
+    invoke-static {p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->startBackup(Landroid/app/Activity;)V
+
+    return-void
+.end method
+
+.method public openRestoreSettings(Landroid/view/View;)V
+    .locals 1
+    .param p1, "v"    # Landroid/view/View;
+
+    .prologue
+    invoke-static {p0}, Lcom/smartisanos/home/settings/LauncherBackupRestore;->startRestore(Landroid/app/Activity;)V
+
+    return-void
+.end method
+
 .method private processWallpaperFromUri(Landroid/net/Uri;)V
     .locals 6
     .param p1, "uri"    # Landroid/net/Uri;
