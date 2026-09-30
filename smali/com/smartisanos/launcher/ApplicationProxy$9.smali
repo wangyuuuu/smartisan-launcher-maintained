@@ -260,6 +260,24 @@
 
     :cond_7b
 
+    # 【维护版 r27】灭屏 / 锁屏出现时，就把解锁动画**同步**准备好。
+    # 原实现把初始化留到解锁那一刻才做（解锁 → onResume → postEmergencyUnlockEvent 事件回调里
+    # 现场调 initUnlockScreenAnimation），而这一步要构建整套「格子」动画节点与时间线，
+    # 于是会出现"已经进桌面约半秒后才突然开始摇动"。
+    # 这里在灭屏广播里同步做完（此时桌面还在渲染、主线程空闲，且用户看不到），
+    # 解锁时 playUnlockAnimation() 就能立刻 start()，动画随进桌面同时开始。
+    # initUnlockAnimation 自身幂等（mUnlockAnimationHasInit 为真会直接 return），重复调用安全；
+    # 本分支在到达前已确认 MainView / PageView 非空、且为单页模式。
+    invoke-static {}, Lcom/smartisanos/launcher/view/MainView;->getInstance()Lcom/smartisanos/launcher/view/MainView;
+
+    move-result-object v4
+
+    invoke-virtual {v4}, Lcom/smartisanos/launcher/view/MainView;->getPageView()Lcom/smartisanos/launcher/view/PageView;
+
+    move-result-object v4
+
+    invoke-virtual {v4}, Lcom/smartisanos/launcher/view/PageView;->initUnlockScreenAnimation()V
+
     .line 534
     :cond_7
     iget-object v4, p0, Lcom/smartisanos/launcher/ApplicationProxy$9;->this$0:Lcom/smartisanos/launcher/ApplicationProxy;
