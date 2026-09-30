@@ -3954,5 +3954,6 @@
     <public type="id" name="item_id_search_usage_sort" id="0x7f0f0192" />
     <public type="id" name="item_id_search_recent_apps" id="0x7f0f0193" />
     <public type="id" name="item_id_notification_badge" id="0x7f0f0194" />
+    <public type="id" name="about_us_version" id="0x7f0f0190" />
     <public type="menu" name="main" id="0x7f100000" />
 </resources>

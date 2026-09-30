@@ -19,6 +19,8 @@
 
 .field public static final about_us_scrollview:I = 0x7f0f012e
 
+.field public static final about_us_version:I = 0x7f0f0190
+
 .field public static final account_email_layout:I = 0x7f0f00b2
 
 .field public static final action0:I = 0x7f0f00f3

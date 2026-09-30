@@ -237,6 +237,80 @@
 .end method
 
 
+# 【维护版 r25】把版本号填到「关于我们」页底部居中的灰色小字上。
+# 版本号从 PackageManager 动态读取（= AndroidManifest 的 versionName，
+# 也就是 apktool.yml 里那个值），所以以后每次发版只改 apktool.yml 即可，
+# 这一页会自动跟着变，不需要同步改任何字符串资源。
+.method private updateVersionView()V
+    .locals 5
+
+    const v0, 0x7f0f0190    # R.id.about_us_version
+
+    invoke-virtual {p0, v0}, Lcom/smartisanos/home/settings/AboutUsActivity;->findViewById(I)Landroid/view/View;
+
+    move-result-object v1
+
+    check-cast v1, Landroid/widget/TextView;
+
+    if-nez v1, :cond_0
+
+    return-void
+
+    :cond_0
+    :try_start_0
+    invoke-virtual {p0}, Lcom/smartisanos/home/settings/AboutUsActivity;->getPackageManager()Landroid/content/pm/PackageManager;
+
+    move-result-object v2
+
+    invoke-virtual {p0}, Lcom/smartisanos/home/settings/AboutUsActivity;->getPackageName()Ljava/lang/String;
+
+    move-result-object v3
+
+    const/4 v4, 0x0
+
+    invoke-virtual {v2, v3, v4}, Landroid/content/pm/PackageManager;->getPackageInfo(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;
+
+    move-result-object v2
+
+    iget-object v2, v2, Landroid/content/pm/PackageInfo;->versionName:Ljava/lang/String;
+    :try_end_0
+    .catch Landroid/content/pm/PackageManager$NameNotFoundException; {:try_start_0 .. :try_end_0} :catch_0
+
+    goto :goto_0
+
+    :catch_0
+    const-string v2, ""
+
+    :goto_0
+    invoke-static {v2}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+
+    move-result v3
+
+    if-eqz v3, :cond_1
+
+    return-void
+
+    :cond_1
+    new-instance v3, Ljava/lang/StringBuilder;
+
+    invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v4, "v"
+
+    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
+
+    return-void
+.end method
+
+
 # virtual methods
 .method protected createActionDialog(Z)Ljava/util/List;
     .locals 6
@@ -464,6 +538,9 @@
     iget-object v1, p0, Lcom/smartisanos/home/settings/AboutUsActivity;->mScrollView:Landroid/widget/ScrollView;
 
     invoke-virtual {v1, v3, v3}, Landroid/widget/ScrollView;->smoothScrollTo(II)V
+
+    # 【维护版 r25】底部居中的灰色小字版本号
+    invoke-direct {p0}, Lcom/smartisanos/home/settings/AboutUsActivity;->updateVersionView()V
 
     .line 64
     return-void

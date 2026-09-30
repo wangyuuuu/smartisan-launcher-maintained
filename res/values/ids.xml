@@ -404,4 +404,5 @@
     <id name="icon_size_preview_medium" />
     <id name="icon_size_preview_large" />
     <id name="icon_size_seekbar" />
+    <id name="about_us_version" />
 </resources>

@@ -8,5 +8,8 @@
             <include layout="@layout/item_bottom_shadow_layout" />
         </LinearLayout>
     </ScrollView>
+    <!-- 【维护版 r25】页面底部居中的版本号：小字号灰色，文本由 AboutUsActivity.updateVersionView()
+         从 PackageManager 动态读取（跟随 apktool.yml 的 versionName），无需手改字符串资源。 -->
+    <TextView android:textSize="12sp" android:textColor="#ff999999" android:id="@id/about_us_version" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:layout_marginBottom="24dp" />
     <include android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/view_title" layout="@layout/title_bar_shadow" />
 </RelativeLayout>
