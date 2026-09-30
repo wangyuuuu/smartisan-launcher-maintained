@@ -361,7 +361,7 @@
     .line 98
     const-string v3, "launcher_badge_swipe_clean"
 
-    sget-object v4, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
+    sget-object v4, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
 
     invoke-virtual {v4}, Ljava/lang/Boolean;->toString()Ljava/lang/String;
 

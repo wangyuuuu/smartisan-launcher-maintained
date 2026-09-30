@@ -59,6 +59,8 @@
 
 .field private mNotificationBadgeSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
+.field private mBadgeSweepCleanSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
+
 .field private mDynamicWeatherSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
 .field private mHideNavigationBarSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
@@ -1034,6 +1036,13 @@
     invoke-virtual {v0, p0}, Lcom/smartisanos/home/settings/SettingItemSwitch;->setOnCheckedChangeListener(Landroid/widget/CompoundButton$OnCheckedChangeListener;)V
 
     :cond_badge
+    iget-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mBadgeSweepCleanSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    if-eqz v0, :cond_badge_sweep
+
+    invoke-virtual {v0, p0}, Lcom/smartisanos/home/settings/SettingItemSwitch;->setOnCheckedChangeListener(Landroid/widget/CompoundButton$OnCheckedChangeListener;)V
+
+    :cond_badge_sweep
     iget-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mDynamicWeatherSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
     if-eqz v0, :cond_dynamic_weather
@@ -3010,6 +3019,13 @@
     invoke-virtual {v0, v1}, Lcom/smartisanos/home/settings/SettingItemSwitch;->setOnCheckedChangeListener(Landroid/widget/CompoundButton$OnCheckedChangeListener;)V
 
     :cond_badge_unreg
+    iget-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mBadgeSweepCleanSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    if-eqz v0, :cond_badge_sweep_unreg
+
+    invoke-virtual {v0, v1}, Lcom/smartisanos/home/settings/SettingItemSwitch;->setOnCheckedChangeListener(Landroid/widget/CompoundButton$OnCheckedChangeListener;)V
+
+    :cond_badge_sweep_unreg
     iget-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mDynamicWeatherSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
     if-eqz v0, :cond_dynamic_weather_unreg
@@ -3745,6 +3761,23 @@
     goto :cond_badge_checked
 
     :cond_badge_next
+    iget-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mBadgeSweepCleanSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    if-eqz v0, :cond_sweep_clean_next
+
+    invoke-virtual {v0}, Lcom/smartisanos/home/settings/SettingItemSwitch;->getSwitch()Lsmartisanos/widget/SwitchEx;
+
+    move-result-object v0
+
+    if-ne p1, v0, :cond_sweep_clean_next
+
+    const-string v0, "launcher_badge_swipe_clean"
+
+    invoke-direct {p0, v0, p2}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->putBoolean(Ljava/lang/String;Z)V
+
+    goto/16 :goto_0
+
+    :cond_sweep_clean_next
     iget-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mDynamicWeatherSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
     if-eqz v0, :cond_dynamic_weather_next
@@ -4737,6 +4770,37 @@
     iput-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mNotificationBadgeSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
     :cond_skip_notification_badge_switch
+    const-string v8, "item_id_badge_sweep_clean"
+
+    const-string v9, "id"
+
+    invoke-virtual {p0}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->getPackageName()Ljava/lang/String;
+
+    move-result-object v10
+
+    invoke-virtual {p0}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->getResources()Landroid/content/res/Resources;
+
+    move-result-object v0
+
+    invoke-virtual {v0, v8, v9, v10}, Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v1
+
+    invoke-virtual {p0, v1}, Lcom/smartisanos/home/settings/view/SettingMainActivity;->findViewById(I)Landroid/view/View;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_skip_badge_sweep_clean
+
+    instance-of v1, v0, Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    if-eqz v1, :cond_skip_badge_sweep_clean
+
+    check-cast v0, Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    iput-object v0, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mBadgeSweepCleanSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    :cond_skip_badge_sweep_clean
     const-string v8, "item_id_dynamic_weather"
 
     const-string v9, "id"
@@ -5417,6 +5481,21 @@
     invoke-virtual {v1, v0}, Lcom/smartisanos/home/settings/SettingItemSwitch;->setChecked(Z)V
 
     :cond_notification_badge_synced
+    iget-object v1, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mBadgeSweepCleanSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
+
+    if-eqz v1, :cond_badge_sweep_synced
+
+    const-string v2, "launcher_badge_swipe_clean"
+
+    const/4 v0, 0x0
+
+    invoke-static {v2, v0}, Lcom/smartisanos/launcher/data/LauncherSettings;->readSetting(Ljava/lang/String;Z)Z
+
+    move-result v2
+
+    invoke-virtual {v1, v2}, Lcom/smartisanos/home/settings/SettingItemSwitch;->setChecked(Z)V
+
+    :cond_badge_sweep_synced
     iget-object v1, p0, Lcom/smartisanos/home/settings/view/SettingMainActivity;->mDynamicWeatherSwitch:Lcom/smartisanos/home/settings/SettingItemSwitch;
 
     if-eqz v1, :cond_dynamic_weather_synced
