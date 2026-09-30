@@ -367,7 +367,7 @@
 
     const-string v2, "swipe_up_action_dialog_title"
 
-    const-string v3, "桌面上滑操作"
+    const-string v3, "桌面双指上滑操作"
 
     invoke-direct {p0, v2, v3}, Lcom/smartisanos/home/settings/view/AdditionalFeaturesActivity;->getStringByName(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
@@ -882,7 +882,7 @@
 
     const-string v2, "swipe_up_action_label"
 
-    const-string v3, "桌面上滑操作"
+    const-string v3, "桌面双指上滑操作"
 
     invoke-direct {p0, v2, v3}, Lcom/smartisanos/home/settings/view/AdditionalFeaturesActivity;->getStringByName(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 

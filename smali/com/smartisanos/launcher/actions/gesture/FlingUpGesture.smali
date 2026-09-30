@@ -18,6 +18,10 @@
 
 .field private static MULTI_TOUCH:Z
 
+# 【维护版 r22】双指标记：由 ACTION_POINTER_DOWN（第二根手指落下）置位。
+# 上滑唤起搜索由「单指」改为「双指」后，本标记成为触发的必要条件。
+.field private static TWO_FINGER:Z
+
 .field private static downLoc:[F
 
 .field private static final log:Lcom/smartisanos/launcher/LOG;
@@ -67,6 +71,9 @@
     .line 28
     sput-boolean v1, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->MULTI_TOUCH:Z
 
+    # 【维护版 r22】TWO_FINGER 默认 false
+    sput-boolean v1, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->TWO_FINGER:Z
+
     .line 30
     sput-boolean v1, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->IS_FLING_DOWN:Z
 
@@ -96,6 +103,9 @@
 
     .line 85
     sput-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->MULTI_TOUCH:Z
+
+    # 【维护版 r22】一并清掉双指标记
+    sput-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->TWO_FINGER:Z
 
     .line 86
     sput-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->IS_FLING_DOWN:Z
@@ -174,7 +184,22 @@
 
     const/4 v1, 0x5
 
-    if-eq v0, v1, :cond_0
+    if-eq v0, v1, :cond_not_pointer_down
+
+    # 【维护版 r22】ACTION_POINTER_DOWN(5) = 第二根手指落下。
+    # 单指→双指改造：这里由原来的「置 MULTI_TOUCH 作废」改为「置 TWO_FINGER 记双指」。
+    sput-boolean v3, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->TWO_FINGER:Z
+
+    return-void
+
+    :cond_not_pointer_down
+    # 新手势起手（ACTION_DOWN）：清掉上一轮遗留标记，避免上一手势被 CANCEL
+    # 中途结束时状态残留到下一次手势。
+    const/4 v0, 0x0
+
+    sput-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->TWO_FINGER:Z
+
+    sput-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->MULTI_TOUCH:Z
 
     sget-object v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->downLoc:[F
 
@@ -187,7 +212,7 @@
     if-eqz v0, :cond_1
 
     .line 40
-    :cond_0
+    # 起手点不在屏幕底部条带内 → 本次手势作废（沿用原逻辑）
     sput-boolean v3, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->MULTI_TOUCH:Z
 
     .line 44
@@ -295,6 +320,12 @@
 
     .line 74
     :cond_2
+    # 【维护版 r22】上滑唤起搜索改为「双指」触发：
+    # 单指上滑（TWO_FINGER == false）直接作废，不再呼出搜索。
+    sget-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->TWO_FINGER:Z
+
+    if-eqz v0, :cond_0
+
     sget-boolean v0, Lcom/smartisanos/launcher/actions/gesture/FlingUpGesture;->IS_FLING_DOWN:Z
 
     if-nez v0, :cond_0

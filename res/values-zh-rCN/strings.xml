@@ -216,11 +216,11 @@
     <string name="page_flip_anim_shutter">百叶窗</string>
     <string name="page_scroll_anim_type">页面翻转动画类型</string>
     <string name="quick_search">快速搜索</string>
-    <string name="swipe_up_search_label">桌面上滑打开搜索</string>
-    <string name="swipe_up_search_tips">开启后可在桌面空白区域上滑呼出搜索</string>
-    <string name="swipe_up_action_label">桌面上滑操作</string>
-    <string name="swipe_up_action_tips">选择在桌面空白区域上滑时执行的操作</string>
-    <string name="swipe_up_action_dialog_title">桌面上滑操作</string>
+    <string name="swipe_up_search_label">桌面双指上滑打开搜索</string>
+    <string name="swipe_up_search_tips">开启后可在桌面空白区域双指上滑呼出搜索</string>
+    <string name="swipe_up_action_label">桌面双指上滑操作</string>
+    <string name="swipe_up_action_tips">选择在桌面空白区域双指上滑时执行的操作</string>
+    <string name="swipe_up_action_dialog_title">桌面双指上滑操作</string>
     <string name="swipe_up_action_none">不执行操作</string>
     <string name="swipe_up_action_search">打开搜索</string>
     <string name="swipe_up_action_multi_page">打开多板块视图</string>
@@ -250,7 +250,7 @@
     <string name="selected_app_tail">]个应用程序</string>
     <string name="selected_back">拖放至这里放回原处</string>
     <string name="setting_about_us">关于我们</string>
-    <string name="setting_default_search_engine_tips">通过内置的搜索 app 或在桌面上滑呼出搜索，即可快速搜索应用和网页内容。如需搜索联系人，可单独开启联系人搜索。</string>
+    <string name="setting_default_search_engine_tips">通过内置的搜索 app 或在桌面双指上滑呼出搜索，即可快速搜索应用和网页内容。如需搜索联系人，可单独开启联系人搜索。</string>
     <string name="setting_engine_set">默认搜索引擎</string>
     <string name="setting_feedback_txt">问题反馈</string>
     <string name="setting_follow_title">关注我们</string>

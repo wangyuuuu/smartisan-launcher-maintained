@@ -214,11 +214,11 @@
     <string name="page_flip_anim_shutter">Window Shades</string>
     <string name="page_scroll_anim_type">Page scroll animation type</string>
     <string name="quick_search">Quick Search</string>
-    <string name="swipe_up_search_label">Swipe Up On Home Screen To Search</string>
-    <string name="swipe_up_search_tips">Swipe up on an empty area of the home screen to open search.</string>
-    <string name="swipe_up_action_label">Home Screen Swipe Up Action</string>
-    <string name="swipe_up_action_tips">Choose what happens when you swipe up on an empty area of the home screen.</string>
-    <string name="swipe_up_action_dialog_title">Home Screen Swipe Up Action</string>
+    <string name="swipe_up_search_label">Two-Finger Swipe Up On Home Screen To Search</string>
+    <string name="swipe_up_search_tips">Use two fingers to swipe up on an empty area of the home screen to open search.</string>
+    <string name="swipe_up_action_label">Two-Finger Swipe Up Action</string>
+    <string name="swipe_up_action_tips">Choose what happens when you swipe up with two fingers on an empty area of the home screen.</string>
+    <string name="swipe_up_action_dialog_title">Two-Finger Swipe Up Action</string>
     <string name="swipe_up_action_none">No Action</string>
     <string name="swipe_up_action_search">Open Search</string>
     <string name="swipe_up_action_multi_page">Open Multi-panel View</string>
@@ -248,7 +248,7 @@
     <string name="selected_app_tail">]</string>
     <string name="selected_back">Drag Here to Put Back</string>
     <string name="setting_about_us">About</string>
-    <string name="setting_default_search_engine_tips">You can use the built-in Search app or the slide out search function on the Launcher to quickly find apps and webpages. Enable contact search separately if needed.</string>
+    <string name="setting_default_search_engine_tips">You can use the built-in Search app, or swipe up with two fingers on the Launcher, to quickly find apps and webpages. Enable contact search separately if needed.</string>
     <string name="setting_engine_set">Default Search</string>
     <string name="setting_feedback_txt">Feedback</string>
     <string name="setting_follow_title">Follow Us</string>
