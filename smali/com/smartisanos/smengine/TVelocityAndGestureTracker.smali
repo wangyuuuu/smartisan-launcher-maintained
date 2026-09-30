@@ -50,10 +50,6 @@
 
 .field private mSweepDownY:F
 
-# 【维护版 r24】本次手势出现过的「总接触面积」峰值 = Σ 各接触点 getSize()。
-# 清扫角标的判据：面积大 = 紧贴屏幕／指腹平贴（多指并拢自然更大），与手指数、方向无关。
-.field private mSweepMaxSize:F
-
 .field private mTouchSizeRecoder:Lcom/smartisanos/smengine/TVelocityAndGestureTracker$TouchSizeRecoder;
 
 .field private mUnits:I
@@ -493,13 +489,6 @@
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
-    # 【维护版 r24】整体停用本路径。
-    # 它是「多指(>=2) 且 800ms 内 >=2 个手指上移超过 250px」-> 清角标，
-    # 即一条「双指上滑」；而「上滑唤起搜索」现为双指，两者方向完全重合，
-    # 实测会让双指上滑一边呼出搜索、一边把角标清掉。
-    # 清角标统一由 canSweep() 负责（r24 判据 = 接触面积大 + 有移动，见 addMovement 的 cond_7）。
-    goto :cond_4
-
     const/4 v8, 0x0
 
     .line 210
@@ -2307,9 +2296,6 @@
 
     iput v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepDownY:F
 
-    # 【维护版 r24】新手势开始：清零面积峰值
-    iput v8, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepMaxSize:F
-
     .line 68
     :cond_0
     iget v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mIndex:I
@@ -2527,104 +2513,6 @@
     .end local v3    # "size":F
     :cond_7
 
-    # ===== 【维护版 r24】清扫角标判据 =「接触面积大（紧贴屏幕） + 有移动」=====
-    # 1) 面积：本次手势 Σ getSize(i) 的峰值 >= SWEEP_MIN_TOTAL_SIZE(0.60f，待标定)
-    #    —— 与手指数无关：指腹平贴、多指并拢都会让总面积变大
-    # 2) 移动：|Δx| + |Δy| >= SWEEP_MIN_MOVE(0.05 屏宽，约 54px)：防"大面积按住不动"误清
-    # 3) 不抢已开始的拖动：DragLayer 处于 拖图标(1)/拖板块(4)/多选拖动(8) 时一律否决
-    #    （不含 滚动(2)：大面积横向移动可能已先被判成滚动，那是允许的）
-    # 方向与手指数都不参与判定。
-
-    const/4 v11, 0x0
-
-    const/4 v6, 0x0
-
-    :goto_sweep_sz
-    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getPointerCount()I
-
-    move-result v4
-
-    if-ge v11, v4, :cond_sweep_sz_done
-
-    invoke-virtual {p1, v11}, Lcom/smartisanos/smengine/TMotionEvent;->getSize(I)F
-
-    move-result v4
-
-    add-float/2addr v6, v4
-
-    add-int/lit8 v11, v11, 0x1
-
-    goto :goto_sweep_sz
-
-    :cond_sweep_sz_done
-    iget v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepMaxSize:F
-
-    cmpg-float v5, v4, v6
-
-    if-gez v5, :cond_sweep_sz_keep
-
-    iput v6, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepMaxSize:F
-
-    # ---- 【标定用，定完阈值即删】ACTION_UP 时打印面积峰值 ----
-    :cond_sweep_sz_keep
-    invoke-virtual {p1}, Lcom/smartisanos/smengine/TMotionEvent;->getAction()I
-
-    move-result v4
-
-    const/4 v5, 0x1
-
-    if-ne v4, v5, :cond_sweep_calib_end
-
-    new-instance v4, Ljava/lang/StringBuilder;
-
-    invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
-
-    const-string v5, "sumMax="
-
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v4
-
-    iget v5, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepMaxSize:F
-
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
-
-    move-result-object v4
-
-    const-string v5, " zoom="
-
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v4
-
-    iget-boolean v5, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightZoom:Z
-
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
-
-    move-result-object v4
-
-    const-string v5, " sweep="
-
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    move-result-object v4
-
-    iget-boolean v5, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
-
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
-
-    move-result-object v4
-
-    invoke-virtual {v4}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v4
-
-    const-string v5, "SweepDbg"
-
-    invoke-static {v5, v4}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;)I
-
-    :cond_sweep_calib_end
-    # ---- 判定 ----
     sget v4, Lcom/smartisanos/launcher/data/Constants;->sPageMode:I
 
     sget v5, Lcom/smartisanos/launcher/data/Constants;->SINGLE_PAGE_MODE:I
@@ -2635,16 +2523,6 @@
 
     if-nez v4, :cond_8
 
-    # ① 面积门槛
-    iget v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mSweepMaxSize:F
-
-    const v5, 0x3f19999a    # 0.60f
-
-    cmpg-float v5, v4, v5
-
-    if-gez v5, :cond_8
-
-    # ② 移动门槛
     invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getX(I)F
 
     move-result v4
@@ -2653,9 +2531,17 @@
 
     sub-float/2addr v4, v5
 
-    invoke-static {v4}, Ljava/lang/Math;->abs(F)F
+    sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
 
-    move-result v10
+    int-to-float v5, v5
+
+    const v6, 0x3e99999a    # 0.3f
+
+    mul-float/2addr v5, v6
+
+    cmpg-float v5, v4, v5
+
+    if-gez v5, :cond_8
 
     invoke-virtual {p1, v8}, Lcom/smartisanos/smengine/TMotionEvent;->getY(I)F
 
@@ -2669,36 +2555,18 @@
 
     move-result v4
 
-    add-float/2addr v10, v4
+    sget v5, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
 
-    sget v4, Lcom/smartisanos/launcher/data/Constants;->screen_width:I
+    int-to-float v5, v5
 
-    int-to-float v4, v4
+    const v6, 0x3df5c28f    # 0.12f
 
-    const v5, 0x3d4ccccd    # 0.05f
+    mul-float/2addr v5, v6
 
-    mul-float/2addr v4, v5
+    cmpl-float v5, v4, v5
 
-    cmpg-float v5, v10, v4
+    if-lez v5, :cond_8
 
-    if-gez v5, :cond_8
-
-    # ③ 不抢已开始的拖动
-    invoke-static {}, Lcom/smartisanos/launcher/view/DragLayer;->getInstance()Lcom/smartisanos/launcher/view/DragLayer;
-
-    move-result-object v4
-
-    if-eqz v4, :cond_sweep_status_ok
-
-    invoke-virtual {v4}, Lcom/smartisanos/launcher/view/DragLayer;->getStatus()I
-
-    move-result v4
-
-    and-int/lit8 v4, v4, 0xd
-
-    if-nez v4, :cond_8
-
-    :cond_sweep_status_ok
     const/4 v4, 0x1
 
     iput-boolean v4, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
@@ -2735,14 +2603,15 @@
     .param p1, "event"    # Lcom/smartisanos/smengine/TMotionEvent;
 
     .prologue
-    # 【维护版 r24】清扫角标判定。判定条件全部集中在 addMovement 的 cond_7，
-    # 这里只读结果标记 mMightSweep（外加 decorView 位置），条件为：
-    #   单页模式 + 本次手势「总接触面积峰值 Σ getSize(i) >= 0.60」+「有移动」+
-    #   「当时没有在拖图标/拖板块/多选拖动」。
-    # 方向与手指数都不参与判定（与「双指上滑呼出搜索」因此不会互相干扰：
-    # 搜索在 FlingUpGesture 里，横扫只认面积）。
-    # 历史：r20 曾是「横向 >= 0.30 屏宽 且 纵向漂移 <= 0.12 屏宽」的几何判定；
-    #       r22 起改为面积判定，因为几何判定与「左右拖动/翻页」同形、会互相抢手势。
+    # 【维护版】横扫（清除图标角标）判定。
+    # 原实现依赖两条老硬件时代的特征，在本机既不可用、又会与「上滑唤起搜索」打架：
+    #   1) mightSweep() -> TouchSizeRecoder 的接触面积判定：老锤子屏上报面积大，
+    #      现代屏（魅族 20 Pro）指尖与指腹的归一化面积重叠，无法区分；
+    #   2) moveDistance < -0.12*屏宽（手指明显上移）：方向上与上滑完全一致，
+    #      所以上滑唤起搜索时也会被判成横扫，两者互相抢手势。
+    # 现改为只认「横向扫」的几何标记 mMightSweep（在 addMovement 中置位，条件为
+    # 横向位移 >= 0.30 屏宽 且 纵向漂移 <= 0.12 屏宽）：上滑/下滑都不会置位，
+    # 因此上滑唤起搜索不再被横扫拦截。
     iget-boolean v0, p0, Lcom/smartisanos/smengine/TVelocityAndGestureTracker;->mMightSweep:Z
 
     if-nez v0, :cond_sweep_no
