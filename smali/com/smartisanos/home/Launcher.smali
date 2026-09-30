@@ -4062,6 +4062,35 @@
 
     iput-boolean v7, p0, Lcom/smartisanos/home/Launcher;->mLauncherIsPreparingPowerOff:Z
 
+    # 【维护版 r28】在投递"播放解锁动画"事件**之前**，先把动画同步准备好。
+    # 原来这一步藏在事件回调里（Launcher$10.run → 现场 initUnlockScreenAnimation），
+    # 要等事件队列轮到它才开始构建整套「格子」动画节点，于是出现
+    # "已经进桌面约半秒后才突然开始摇动"。提前到这里同步做完，playUnlockAnimation()
+    # 就能立刻 start()，动画随进桌面同时开始。
+    # · init 用的页面与随后 play 取的是同一个（getCurrentPageInWindowForSinglePageMode），
+    #   所以不存在数据过期问题；
+    # · initUnlockAnimation 幂等（已就绪直接 return）；页面未就绪则判空跳过，不会崩。
+    invoke-static {}, Lcom/smartisanos/launcher/view/MainView;->getInstance()Lcom/smartisanos/launcher/view/MainView;
+
+    move-result-object v4
+
+    if-eqz v4, :cond_r28_skip
+
+    invoke-virtual {v4}, Lcom/smartisanos/launcher/view/MainView;->getPageView()Lcom/smartisanos/launcher/view/PageView;
+
+    move-result-object v5
+
+    if-eqz v5, :cond_r28_skip
+
+    invoke-virtual {v5}, Lcom/smartisanos/launcher/view/PageView;->getCurrentPageInWindowForSinglePageMode()Lcom/smartisanos/launcher/view/Page;
+
+    move-result-object v6
+
+    if-eqz v6, :cond_r28_skip
+
+    invoke-virtual {v5}, Lcom/smartisanos/launcher/view/PageView;->initUnlockScreenAnimation()V
+
+    :cond_r28_skip
     invoke-direct {p0}, Lcom/smartisanos/home/Launcher;->postEmergencyUnlockEvent()V
 
     :cond_12_skip_emergency
